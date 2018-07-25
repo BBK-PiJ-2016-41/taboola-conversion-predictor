@@ -15,3 +15,6 @@ class TaboolaConnector(Connector):
 
     def get_data(self):
         TODO
+    
+    def get_credentials(self, authenticator):
+        TODO

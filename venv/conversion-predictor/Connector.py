@@ -21,3 +21,7 @@ class Connector(ABC):
     @abstractmethod
     def get_data(self):
         TODO
+        
+    @abstractmethod
+    def get_credentials(self, authenticator):
+        TODO
