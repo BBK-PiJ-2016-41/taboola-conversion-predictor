@@ -1,4 +1,4 @@
-from AdHeadlineExtraction import AdExtractor
+from conversion_predictor.AdHeadlineExtraction import AdExtractor
 import unittest
 from unittest import TestCase
 import pandas as pd
