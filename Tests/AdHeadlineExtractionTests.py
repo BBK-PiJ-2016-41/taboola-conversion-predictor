@@ -42,6 +42,10 @@ class HeadlineTester(TestCase):
         with self.assertRaises(KeyError):
             AdExtractor(headline_to_test)
 
+    def test_headline_not_text(self):
+        headline_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text': [2]})
+        with self.assertRaises(ValueError):
+            AdExtractor(headline_to_test)
 
 if __name__ == '__main__':
     unittest.main()

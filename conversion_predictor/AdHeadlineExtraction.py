@@ -9,13 +9,15 @@ class AdExtractor:
         Constructor for AdExtractor.
         :param data_frame: A data_frame of two columns containing the ad_id and headline_text
         """
+
         try:
+            if data_frame['headline_text'].dtype != 'object':
+                raise ValueError('Headline text not expected data type - please use text object')
             self.df = data_frame.set_index('ad_id')
         except KeyError:
             raise
-
-        if 'headline_text' not in data_frame.columns:
-            raise KeyError
+        except ValueError:
+            raise
 
         self.punctuation = r'[,?!.:;&]'
 
