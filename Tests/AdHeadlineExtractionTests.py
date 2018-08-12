@@ -32,6 +32,10 @@ class HeadlineTester(TestCase):
         self.assertEquals(0, result.iloc[0]['num_params'])
         self.assertEquals(0, result.iloc[0]['num_puncs'])
 
+    def test_contains_ad_id(self):
+        headline_to_test = pd.DataFrame({'ad': ['1'], 'headline_text': ["Over 55s in London Can Now Use This Free Equity Release Calculator"]})
+        with self.assertRaises(KeyError):
+            AdExtractor(headline_to_test)
 
 if __name__ == '__main__':
     unittest.main()
