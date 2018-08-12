@@ -12,8 +12,8 @@ class HeadlineTester(TestCase):
         self.assertEqual(1, ad_extractor.num_dynamic_params().iloc[0]['num_params'])
 
     def test_count_zero_params(self):
-        headline_to_test = pd.DataFrame(columns=["ad_id", "headline_text"], data=["1", "Over 55s in London Can Now Use This Free Equity Release Calculator"])
-        headline_to_test.set_index("ad_id")
+        headline_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text': ["Over 55s in London Can Now Use This Free Equity Release Calculator"]})
+        headline_to_test.set_index('ad_id')
         ad_extractor = AdExtractor(headline_to_test)
         self.assertEquals(0, ad_extractor.num_dynamic_params().iloc[0]['num_params'])
 
