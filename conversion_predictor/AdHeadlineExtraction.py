@@ -14,6 +14,9 @@ class AdExtractor:
         except KeyError:
             raise
 
+        if 'headline_text' not in data_frame.columns:
+            raise KeyError
+
         self.punctuation = r'[,?!.:;&]'
 
     def num_dynamic_params(self):
