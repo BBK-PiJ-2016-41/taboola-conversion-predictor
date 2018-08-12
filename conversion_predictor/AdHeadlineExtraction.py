@@ -9,18 +9,18 @@ class AdExtractor:
         Constructor for AdExtractor.
         :param data_frame: A data_frame of two columns containing the ad_id and headline_text
         """
-        self.df = data_frame
+        self.df = data_frame.set_index('ad_id')
         self.punctuation = r'[,?!.:;&]'
 
     def num_dynamic_params(self):
-        return_df = self.df
+        return_df = self.df.copy()
         return_df['num_params'] = return_df['headline_text'].apply(lambda row: len(re.findall(r'\${', row)))
-        return return_df
+        return return_df.drop('headline_text', axis=1)
 
     def num_punc_marks(self):
-        return_df = self.df
+        return_df = self.df.copy()
         return_df['num_puncs'] = return_df['headline_text'].apply(lambda row: len(re.findall(self.punctuation, row)))
-        return return_df
+        return return_df.drop('headline_text', axis=1)
 
     def run_all(self):
-        TODO
+        return self.num_dynamic_params().join(self.num_punc_marks(), on='ad_id')
