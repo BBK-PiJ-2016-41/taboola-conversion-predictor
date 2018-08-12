@@ -9,7 +9,11 @@ class AdExtractor:
         Constructor for AdExtractor.
         :param data_frame: A data_frame of two columns containing the ad_id and headline_text
         """
-        self.df = data_frame.set_index('ad_id')
+        try:
+            self.df = data_frame.set_index('ad_id')
+        except KeyError:
+            raise
+
         self.punctuation = r'[,?!.:;&]'
 
     def num_dynamic_params(self):

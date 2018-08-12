@@ -2,7 +2,7 @@ from conversion_predictor.AdHeadlineExtraction import AdExtractor
 import unittest
 from unittest import TestCase
 import pandas as pd
-import numpy as np
+
 
 class HeadlineTester(TestCase):
     def test_count_params(self):
@@ -36,6 +36,7 @@ class HeadlineTester(TestCase):
         headline_to_test = pd.DataFrame({'ad': ['1'], 'headline_text': ["Over 55s in London Can Now Use This Free Equity Release Calculator"]})
         with self.assertRaises(KeyError):
             AdExtractor(headline_to_test)
+
 
 if __name__ == '__main__':
     unittest.main()
