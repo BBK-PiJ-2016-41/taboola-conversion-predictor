@@ -15,7 +15,7 @@ class UrlTester(TestCase):
         with self.assertRaises(KeyError):
             UrlTransformer(url_to_test)
 
-    def test_headline_not_text(self):
+    def test_url_not_text(self):
         url_to_test = pd.DataFrame({'ad_id': ['1'], 'url': [2]})
         with self.assertRaises(ValueError):
             UrlTransformer(url_to_test)
