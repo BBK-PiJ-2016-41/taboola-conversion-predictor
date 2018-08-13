@@ -1,6 +1,7 @@
+import re
+
 class UrlTransformer:
 
-    self.dataframe
 
     def __init__(self, df):
         self.dataframe = df
@@ -14,13 +15,11 @@ class UrlTransformer:
 
 class HtmlTransformer:
 
-    self.html
-    self.text
 
     def __init__(self, df):
         self.html = df
 
-    def extract_text:
+    def extract_text(self):
         TODO
 
     def extract_clickouts(self):
@@ -47,7 +46,6 @@ class HtmlTransformer:
 
 class TextProcessor:
 
-    self.text
 
     def __init__(self, txt):
         self.text = txt
