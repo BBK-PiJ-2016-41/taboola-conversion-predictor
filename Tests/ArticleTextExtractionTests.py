@@ -31,3 +31,4 @@ class UrlTester(TestCase):
         transformer = UrlTransformer(url_to_test)
         result = transformer.extract_domains()
         self.assertEquals(1.0, result.iloc[0]['expertsinmoney'])
+        self.assertTrue('ad_id' in result.columns.values)
