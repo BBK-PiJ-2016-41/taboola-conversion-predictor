@@ -1,4 +1,4 @@
-import re
+import requests
 
 class UrlTransformer:
 
@@ -14,7 +14,9 @@ class UrlTransformer:
             raise
 
     def extract_html(self):
-        TODO
+        return_df = self.df.copy()
+        return_df['html'] = return_df['url'].apply(lambda row: requests.get(row, allow_redirects=False).text)
+        return return_df.drop('url', axis=1)
 
     def extract_domains(self):
         TODO
