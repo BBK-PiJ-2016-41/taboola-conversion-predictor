@@ -78,7 +78,6 @@ class HtmlTransformer:
     def extract_clickouts(self):
         self.df['num_clickouts'] = self.df['html'].apply(
             lambda row: self.count_links(self.beautiful_soup(row).find_all('a', href=True)))
-        print(self.df[['num_clickouts']])
         return self.df[['num_clickouts']]
 
     def count_links(self, soupy_links):
@@ -114,15 +113,37 @@ class HtmlTransformer:
         self.df['num_words'] = self.df['text'].apply(lambda row: len(re.findall(r'\w+', row)))
         return self.df[['num_words']]
 
-    def extract_num_numbers(self):
-        TODO
-
     def extract_syllables_word(self):
-        TODO
+        if 'num_words' not in self.df.columns.values:
+            self.extract_total_words()
+        df_copy = self.df.copy()
+        df_copy['syllables'] = self.df['text'].apply(lambda row: sum(map(lambda word: self.syllable_count(word), row.split(' '))))
+        self.df['syllables_word'] = round(df_copy.syllables/self.df.num_words, 4)
+        return self.df[['syllables_word']]
+
+    def syllable_count(self, word):
+        word = word.lower()
+        count = 0
+        vowels = 'aeiouy'
+        if word[0] in vowels:
+            count += 1
+        for index in range(1, len(word)):
+            if word[index] in vowels and word[index - 1] not in vowels:
+                count += 1
+                if word.endswith('e'):
+                    count -= 1
+        if count == 0:
+            count += 1
+        return count
+    # credit https://stackoverflow.com/questions/46759492/syllable-count-in-python
 
     def extract_all(self):
-        TODO
-
+        self.extract_words_sentence()
+        self.extract_words_para()
+        self.extract_syllables_word()
+        self.extract_num_paras()
+        self.extract_clickouts()
+        return self.df
 
 class TextProcessor:
 

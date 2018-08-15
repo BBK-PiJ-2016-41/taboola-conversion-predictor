@@ -63,19 +63,15 @@ class HtmlTester(TestCase):
         result = self.html_transformer.extract_clickouts()
         self.assertEqual(32, result.iloc[0]['num_clickouts'])
 
-    def test_num_numbers(self):
-        result = self.html_transformer.extract_num_numbers()
-        self.assertEqual(5, result.iloc[0]['num_numbers'])
-
     def test_syllables_word(self):
         result = self.html_transformer.extract_syllables_word()
-        self.assertEqual(1.5, result.iloc[0]['syllables_word'])
+        self.assertEqual(1.4735, result.iloc[0]['syllables_word'])
 
     def test_run_all(self):
         result = self.html_transformer.extract_all()
-        self.assertEqual(21.1667, result.iloc[0]['words_para'])
+        self.assertEqual(46.4615, result.iloc[0]['words_para'])
         self.assertEqual(604, result.iloc[0]['num_words'])
         self.assertEqual(13, result.iloc[0]['num_paras'])
-        self.assertEqual(14.1111, result.iloc[0]['words_sentence'])
-        self.assertEqual(5, result.iloc[0]['num_numbers'])
-        self.assertEqual(1.5, result.iloc[0]['syllables_word'])
+        self.assertEqual(13.7273, result.iloc[0]['words_sentence'])
+        self.assertEqual(1.4735, result.iloc[0]['syllables_word'])
+        self.assertEqual(32, result.iloc[0]['num_clickouts'])
