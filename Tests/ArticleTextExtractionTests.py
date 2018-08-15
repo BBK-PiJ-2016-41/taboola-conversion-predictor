@@ -49,7 +49,7 @@ class HtmlTester(TestCase):
 
     def test_words_para(self):
         result = self.html_transformer.extract_words_para()
-        self.assertEqual(21.1667, result.iloc[0]['words_para'])
+        self.assertEqual(46.4615, result.iloc[0]['words_para'])
 
     def test_num_paras(self):
         result = self.html_transformer.extract_num_paras()
