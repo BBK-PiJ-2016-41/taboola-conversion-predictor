@@ -38,11 +38,10 @@ class UrlTester(TestCase):
 class HtmlTester(TestCase):
 
     def setUp(self):
-        url_to_test = pd.DataFrame(
-            {'ad_id': ['1'], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
+        url_to_test = pd.DataFrame({'ad_id': ['1'], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
         transformer = UrlTransformer(url_to_test)
         self.html_result = transformer.extract_html()
-        self.html_transformer = HtmlTransformer(self.html_result)
+        self.html_transformer = HtmlTransformer(self.html_result.drop('index', axis=1))
 
     def test_num_words(self):
         result = self.html_transformer.extract_total_words()
@@ -54,7 +53,7 @@ class HtmlTester(TestCase):
 
     def test_num_paras(self):
         result = self.html_transformer.extract_num_paras()
-        self.assertEqual(12, result.iloc[0]['num_paras'])
+        self.assertEqual(13, result.iloc[0]['num_paras'])
 
     def test_words_sentence(self):
         result = self.html_transformer.extract_words_sentence()

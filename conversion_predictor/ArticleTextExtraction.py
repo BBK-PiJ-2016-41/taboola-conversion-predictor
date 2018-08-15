@@ -3,6 +3,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 from urllib import parse
+from bs4 import BeautifulSoup
 
 
 class UrlTransformer:
@@ -45,17 +46,40 @@ class UrlTransformer:
 
 class HtmlTransformer:
 
-    def __init__(self, df):
-        self.html = df
+    def __init__(self, data_frame):
+        try:
+            if data_frame['html'].dtype != 'object':
+                raise ValueError('HTML not expected data type - please use text object')
+            self.df = data_frame.set_index('ad_id')
+        except KeyError:
+            raise
+        except ValueError:
+            raise
+
+        self.extract_text()
 
     def extract_text(self):
-        TODO
+        self.df['text'] = self.df['html'].apply(lambda row: self.cleanup(row))
+
+    def beautiful_soup(self, html_snippet):
+        return BeautifulSoup(html_snippet, 'html.parser')
+
+    def cleanup(self, html_snippet):
+        soup = self.beautiful_soup(html_snippet)
+        for script in soup(['script', 'style']):
+            script.extract()
+        text = soup.get_text()
+        lines = (line.strip() for line in text.splitlines())
+        chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
+        text = '\n'.join(chunk for chunk in chunks if chunk)
+        return text
 
     def extract_clickouts(self):
         TODO
 
     def extract_num_paras(self):
-        TODO
+        self.df['num_paras'] = self.df['html'].apply(lambda row: len(self.beautiful_soup(row).find_all('p')))
+        return self.df
 
     def extract_words_para(self):
         TODO
