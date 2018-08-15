@@ -45,7 +45,7 @@ class HtmlTester(TestCase):
 
     def test_num_words(self):
         result = self.html_transformer.extract_total_words()
-        self.assertEqual(254, result.iloc[0]['num_words'])
+        self.assertEqual(604, result.iloc[0]['num_words'])
 
     def test_words_para(self):
         result = self.html_transformer.extract_words_para()
@@ -74,8 +74,8 @@ class HtmlTester(TestCase):
     def test_run_all(self):
         result = self.html_transformer.extract_all()
         self.assertEqual(21.1667, result.iloc[0]['words_para'])
-        self.assertEqual(254, result.iloc[0]['num_words'])
-        self.assertEqual(12, result.iloc[0]['num_paras'])
+        self.assertEqual(604, result.iloc[0]['num_words'])
+        self.assertEqual(13, result.iloc[0]['num_paras'])
         self.assertEqual(14.1111, result.iloc[0]['words_sentence'])
         self.assertEqual(5, result.iloc[0]['num_numbers'])
         self.assertEqual(1.5, result.iloc[0]['syllables_word'])

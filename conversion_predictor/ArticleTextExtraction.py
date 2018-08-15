@@ -4,6 +4,7 @@ from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 from urllib import parse
 from bs4 import BeautifulSoup
+import re
 
 
 class UrlTransformer:
@@ -88,7 +89,8 @@ class HtmlTransformer:
         TODO
 
     def extract_total_words(self):
-        TODO
+        self.df['num_words'] = self.df['text'].apply(lambda row: len(re.findall(r'\w+', row)))
+        return self.df
 
     def extract_num_numbers(self):
         TODO
