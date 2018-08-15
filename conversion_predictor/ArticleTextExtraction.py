@@ -76,7 +76,15 @@ class HtmlTransformer:
         return text
 
     def extract_clickouts(self):
-        TODO
+        self.df['num_clickouts'] = self.df['html'].apply(
+            lambda row: self.count_links(self.beautiful_soup(row).find_all('a', href=True)))
+        print(self.df[['num_clickouts']])
+        return self.df[['num_clickouts']]
+
+    def count_links(self, soupy_links):
+        hrefs = list(map(lambda link: link['href'], soupy_links))
+        most_common = max(set(hrefs), key=hrefs.count)
+        return hrefs.count(most_common)
 
     def extract_num_paras(self):
         self.df['num_paras'] = self.df['html'].apply(lambda row: len(self.beautiful_soup(row).find_all('p')))
