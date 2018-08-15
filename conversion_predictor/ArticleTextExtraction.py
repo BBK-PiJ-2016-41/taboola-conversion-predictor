@@ -34,6 +34,7 @@ class UrlTransformer:
         feature_labels = list(gle.classes_)
         features_final = pd.DataFrame(feature_array, columns=feature_labels)
         combined = pd.merge(df_copy, features_final, left_index=True, right_index=True)
+        combined.set_index('ad_id')
         return combined.drop('domain_label', axis=1)
 
     def trim_domains(self):
@@ -56,7 +57,7 @@ class HtmlTransformer:
     def extract_num_paras(self):
         TODO
 
-    def extract_words_paras(self):
+    def extract_words_para(self):
         TODO
 
     def extract_words_sentence(self):
@@ -66,6 +67,9 @@ class HtmlTransformer:
         TODO
 
     def extract_num_numbers(self):
+        TODO
+
+    def extract_syllables_word(self):
         TODO
 
     def extract_all(self):
@@ -91,4 +95,7 @@ class TextProcessor:
         TODO
 
     def pos_tagger(self):
+        TODO
+
+    def extract_all(self):
         TODO
