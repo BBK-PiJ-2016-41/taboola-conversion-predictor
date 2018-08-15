@@ -61,6 +61,7 @@ class HtmlTransformer:
 
     def extract_text(self):
         self.df['text'] = self.df['html'].apply(lambda row: self.cleanup(row))
+        return self.df[['text']]
 
     def beautiful_soup(self, html_snippet):
         return BeautifulSoup(html_snippet, 'html.parser')
@@ -145,11 +146,19 @@ class HtmlTransformer:
         self.extract_clickouts()
         return self.df
 
+
 class TextProcessor:
 
-
-    def __init__(self, txt):
-        self.text = txt
+    def __init__(self, data_frame):
+        self.df = data_frame
+        # try:
+        #     if data_frame['text'].dtype != 'object':
+        #         raise ValueError('Text not expected data type - please use text object')
+        #     self.df = data_frame.set_index('ad_id')
+        # except KeyError:
+        #     raise
+        # except ValueError:
+        #     raise
 
     def lemmatize(self):
         TODO
@@ -161,9 +170,6 @@ class TextProcessor:
         TODO
 
     def cosine_similarity(self):
-        TODO
-
-    def pos_tagger(self):
         TODO
 
     def extract_all(self):

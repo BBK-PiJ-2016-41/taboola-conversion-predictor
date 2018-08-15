@@ -1,6 +1,6 @@
 from conversion_predictor.ArticleTextExtraction import UrlTransformer
 from conversion_predictor.ArticleTextExtraction import HtmlTransformer
-import unittest
+from conversion_predictor.ArticleTextExtraction import TextProcessor
 from unittest import TestCase
 import pandas as pd
 
@@ -34,6 +34,7 @@ class UrlTester(TestCase):
         result = transformer.extract_domains()
         self.assertEquals(1.0, result.iloc[0]['expertsinmoney'])
         self.assertTrue('ad_id' in result.columns.values)
+
 
 class HtmlTester(TestCase):
 
@@ -75,3 +76,23 @@ class HtmlTester(TestCase):
         self.assertEqual(13.7273, result.iloc[0]['words_sentence'])
         self.assertEqual(1.4735, result.iloc[0]['syllables_word'])
         self.assertEqual(32, result.iloc[0]['num_clickouts'])
+
+
+class TextExtractionTester(TestCase):
+
+    def setUp(self):
+        url_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text': ["How Much Does Private Healthcare Actually Cost?"], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
+        transformer = UrlTransformer(url_to_test)
+        url_to_test = url_to_test.set_index('ad_id')
+        html_result = transformer.extract_html()
+        html_transformer = HtmlTransformer(html_result.drop('index', axis=1))
+        text_result = html_transformer.extract_text()
+        self.text_processor = TextProcessor(text_result.join(url_to_test, on='ad_id'))
+
+    def test_cosine_similarity(self):
+        result = self.text_processor.cosine_similarity()
+        self.assertEqual(0.163313, result.iloc[0]['cosine_similarity'])
+
+    def test_tf_idf(self):
+        result = self.text_processor.tf_idf()
+        self.assertEqual(0.004, result.iloc[0], 'waiting')
