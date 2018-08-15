@@ -80,27 +80,31 @@ class HtmlTransformer:
 
     def extract_num_paras(self):
         self.df['num_paras'] = self.df['html'].apply(lambda row: len(self.beautiful_soup(row).find_all('p')))
-        return self.df
+        return self.df[['num_paras']]
 
     def extract_words_para(self):
         if 'num_words' not in self.df.columns.values:
             self.extract_total_words()
-        if 'words_para' not in self.df.columns.values:
+        if 'num_paras' not in self.df.columns.values:
             self.extract_num_paras()
         self.df['words_para'] = round(self.df.num_words / self.df.num_paras, 4)
-        print(self.df[['words_para']])
         return self.df[['words_para']]
 
     def extract_words_sentence(self):
-        TODO
+        if 'num_words' not in self.df.columns.values:
+            self.extract_total_words()
+        if 'num_sentences' not in self.df.columns.values:
+            self.extract_num_sentences()
+        self.df['words_sentence'] = round(self.df.num_words / self.df.num_sentences, 4)
+        return self.df[['words_sentence']]
 
     def extract_num_sentences(self):
         self.df['num_sentences'] = self.df['text'].apply(lambda row: len(re.split(r'[.!?]+', row)))
-        return self.df[['ad_id', 'num_sentences']]
+        return self.df[['num_sentences']]
 
     def extract_total_words(self):
         self.df['num_words'] = self.df['text'].apply(lambda row: len(re.findall(r'\w+', row)))
-        return self.df
+        return self.df[['num_words']]
 
     def extract_num_numbers(self):
         TODO

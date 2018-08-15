@@ -57,7 +57,7 @@ class HtmlTester(TestCase):
 
     def test_words_sentence(self):
         result = self.html_transformer.extract_words_sentence()
-        self.assertEqual(14.1111, result.iloc[0]['words_sentence'])
+        self.assertEqual(13.7273, result.iloc[0]['words_sentence'])
 
     # def test_clickouts(self):
     #     result = self.html_transformer.extract_total_words()
