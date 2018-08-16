@@ -5,6 +5,12 @@ import pandas as pd
 from urllib import parse
 from bs4 import BeautifulSoup
 import re
+from sklearn.metrics.pairwise import cosine_similarity
+from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+import nltk
 
 
 class UrlTransformer:
@@ -150,21 +156,46 @@ class HtmlTransformer:
 class TextProcessor:
 
     def __init__(self, data_frame):
-        self.df = data_frame
-        # try:
-        #     if data_frame['text'].dtype != 'object':
-        #         raise ValueError('Text not expected data type - please use text object')
-        #     self.df = data_frame.set_index('ad_id')
-        # except KeyError:
-        #     raise
-        # except ValueError:
-        #     raise
+        try:
+            if data_frame['text'].dtype != 'object':
+                 raise ValueError('Text not expected data type - please use text object')
+            if 'ad_id' != data_frame.index.name:
+                raise KeyError('Ad ID not found as index')
+            self.df = data_frame
+        except KeyError:
+            raise
+        except ValueError:
+            raise
+        nltk.download('stopwords')
 
     def lemmatize(self):
-        TODO
+        if ('stop_word_headline' not in self.df.columns.values):
+            self.remove_stop_words()
+        self.df['lemmatized_headline'] = self.df['stop_word_headline'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        self.df['lemmatized_text'] = self.df['stop_word_text'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+
+    def lemmatizer(self, text):
+        wordnet_lemmatizer = WordNetLemmatizer()
+        removed_extra_spaces = word_tokenize(' '.join(list(filter(None, text.split(r'\s')))))
+        words_lemmatized = []
+        for word in removed_extra_spaces:
+            words_lemmatized.append(wordnet_lemmatizer.lemmatize(word))
+        print(' '.join(words_lemmatized))
+        return ' '.join(words_lemmatized)
 
     def remove_stop_words(self):
-        TODO
+        self.df['stop_word_headline'] = self.df['headline_text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        self.df['stop_word_text'] = self.df['text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+
+    def stop_word_remover(self, text):
+        removed_extra_spaces = word_tokenize(' '.join(list(filter(None, text.split(r'\s')))))
+        stop_words = set(stopwords.words('english'))
+        words_filtered = []
+        for word in removed_extra_spaces:
+            if word not in stop_words or word == 'this':
+                words_filtered.append(word)
+        print(words_filtered)
+        return ' '.join(words_filtered)
 
     def tf_idf(self):
         TODO

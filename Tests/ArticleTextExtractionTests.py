@@ -87,7 +87,8 @@ class TextExtractionTester(TestCase):
         html_result = transformer.extract_html()
         html_transformer = HtmlTransformer(html_result.drop('index', axis=1))
         text_result = html_transformer.extract_text()
-        self.text_processor = TextProcessor(text_result.join(url_to_test, on='ad_id'))
+        text_headline = text_result.join(url_to_test, on='ad_id')
+        self.text_processor = TextProcessor(text_headline)
 
     def test_cosine_similarity(self):
         result = self.text_processor.cosine_similarity()
@@ -96,3 +97,6 @@ class TextExtractionTester(TestCase):
     def test_tf_idf(self):
         result = self.text_processor.tf_idf()
         self.assertEqual(0.004, result.iloc[0], 'waiting')
+
+    def test_lemmatize(self):
+        self.text_processor.lemmatize()
