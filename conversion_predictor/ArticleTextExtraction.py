@@ -309,4 +309,11 @@ class TextProcessor:
             item[0] = item[0] + '_text'
             combined_values.append(item)
         combined_df = pd.DataFrame(combined_values, columns=['ad_id', 'text'])
-        print(combined_df)
+        tf_idf = self.calculate_tf_idf(combined_df['text'])
+        tf_idf = tf_idf.join(combined_df)
+        tf_idf = tf_idf.drop('text', axis=1)
+        similarity_matrix = cosine_similarity(tf_idf.drop('ad_id', axis=1))
+        similarity_df = pd.DataFrame(similarity_matrix)
+        copy_df = self.df.reset_index()
+        copy_df['cosine_similarity'] = copy_df['ad_id'].apply(lambda row: similarity_df.iloc[tf_idf.loc[tf_idf['ad_id'] == row + '_headline'].index[0]][tf_idf.loc[tf_idf['ad_id'] == row + '_text'].index[0]])
+        return copy_df[['ad_id', 'cosine_similarity']]
