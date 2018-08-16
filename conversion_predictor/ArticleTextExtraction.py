@@ -2,11 +2,12 @@ import requests
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
+import numpy as np
 from urllib import parse
 from bs4 import BeautifulSoup
 import re
 from sklearn.metrics.pairwise import cosine_similarity
-from nltk.tokenize import sent_tokenize, word_tokenize
+from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -169,7 +170,7 @@ class TextProcessor:
         nltk.download('stopwords')
 
     def lemmatize(self):
-        if ('stop_word_headline' not in self.df.columns.values):
+        if 'stop_word_headline' not in self.df.columns.values:
             self.remove_stop_words()
         self.df['lemmatized_headline'] = self.df['stop_word_headline'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
         self.df['lemmatized_text'] = self.df['stop_word_text'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
@@ -180,7 +181,6 @@ class TextProcessor:
         words_lemmatized = []
         for word in removed_extra_spaces:
             words_lemmatized.append(wordnet_lemmatizer.lemmatize(word))
-        print(' '.join(words_lemmatized))
         return ' '.join(words_lemmatized)
 
     def remove_stop_words(self):
@@ -194,11 +194,24 @@ class TextProcessor:
         for word in removed_extra_spaces:
             if word not in stop_words or word == 'this':
                 words_filtered.append(word)
-        print(words_filtered)
         return ' '.join(words_filtered)
 
     def tf_idf(self):
-        TODO
+        if 'lemmatized_headline' not in self.df.columns.values:
+            self.lemmatize()
+        headline_df = self.df.copy()
+        headline_df = headline_df.reset_index()
+        headline_array = self.calculate_tf_idf(headline_df['lemmatized_headline'])
+        text_array = self.calculate_tf_idf(headline_df['lemmatized_text'])
+        combined = headline_df.join(headline_array)
+        return combined.join(text_array, lsuffix='_headline', rsuffix='_text')
+
+    def calculate_tf_idf(self, data_frame_column):
+        vectorizer = TfidfVectorizer()
+        tfidf = vectorizer.fit_transform(data_frame_column)
+        tfidf_matrix = tfidf.toarray()
+        vocab = vectorizer.get_feature_names()
+        return pd.DataFrame(np.round(tfidf_matrix, 8), columns=vocab)
 
     def cosine_similarity(self):
         TODO

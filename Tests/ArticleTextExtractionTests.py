@@ -96,7 +96,7 @@ class TextExtractionTester(TestCase):
 
     def test_tf_idf(self):
         result = self.text_processor.tf_idf()
-        self.assertEqual(0.004, result.iloc[0], 'waiting')
+        self.assertEqual(0.028228, round(result.iloc[0]['yorkshire'], 6))
 
     def test_lemmatize(self):
         self.text_processor.lemmatize()
