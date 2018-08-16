@@ -17,6 +17,12 @@ import nltk
 class UrlTransformer:
 
     def __init__(self, data_frame):
+        """
+        Constructor for URL Transformer.
+        :param a dataframe containing the ad id and URL
+        :except Value Error if URL is not present/not expected data type
+        :except Key Error if ad id is not present
+        """
         try:
             if data_frame['url'].dtype != 'object':
                 raise ValueError('URL not expected data type - please use text object')
@@ -29,11 +35,19 @@ class UrlTransformer:
             raise
 
     def extract_html(self):
+        """
+        Extracts the html from the url provided.
+        :return: A dataframe containing ad id and html
+        """
         return_df = self.df.copy()
         return_df['html'] = return_df['url'].apply(lambda row: requests.get(row, allow_redirects=False).text)
         return return_df.drop('url', axis=1)
 
     def extract_domains(self):
+        """
+        Creates a category for each domain in the dataframe using One Hot Encoder
+        :return: a dataframe containing ad id and categorical representations of each domain
+        """
         df_copy = self.trim_domains()
         gle = LabelEncoder()
         labels = gle.fit_transform(df_copy['domain'])
@@ -47,6 +61,10 @@ class UrlTransformer:
         return combined.drop('domain_label', axis=1)
 
     def trim_domains(self):
+        """
+        Extracts the domains from the urls
+        :return: a dataframe containing ad id and the domain extracted from the url.
+        """
         df_copy = self.df.copy()
         df_copy['domain'] = df_copy['url'].apply(lambda row: parse.urlparse(row).netloc.split('.')[1])
         return df_copy.drop('url', axis=1)
@@ -55,6 +73,12 @@ class UrlTransformer:
 class HtmlTransformer:
 
     def __init__(self, data_frame):
+        """
+        Constructor for HTML Transformer.
+        :param a dataframe containing the ad id and URL
+        :except Value Error if HTML is not present/not expected data type
+        :except Key Error if ad id is not present
+        """
         try:
             if data_frame['html'].dtype != 'object':
                 raise ValueError('HTML not expected data type - please use text object')
@@ -67,13 +91,27 @@ class HtmlTransformer:
         self.extract_text()
 
     def extract_text(self):
+        """
+        Extracts the text from the raw html provided
+        :return: a dataframe containing ad id and text
+        """
         self.df['text'] = self.df['html'].apply(lambda row: self.cleanup(row))
         return self.df[['text']]
 
     def beautiful_soup(self, html_snippet):
+        """
+        A helper function for the cleanup of html
+        :param html_snippet: a text string of html
+        :return: a BeautifulSoup object to parse html
+        """
         return BeautifulSoup(html_snippet, 'html.parser')
 
     def cleanup(self, html_snippet):
+        """
+        A helper function for text extraction
+        :param html_snippet: a text string of html
+        :return: a text string cleaned of javascript and styling
+        """
         soup = self.beautiful_soup(html_snippet)
         for script in soup(['script', 'style']):
             script.extract()
@@ -84,20 +122,38 @@ class HtmlTransformer:
         return text
 
     def extract_clickouts(self):
+        """
+        Counts the number of clickouts to the conversion form from each article page. Assumes
+        that the most commonly used link is the form.
+        :return: A dataframe containing ad id and the number of clickouts to the most commonly used link
+        """
         self.df['num_clickouts'] = self.df['html'].apply(
             lambda row: self.count_links(self.beautiful_soup(row).find_all('a', href=True)))
         return self.df[['num_clickouts']]
 
     def count_links(self, soupy_links):
+        """
+        A helper function for extracting clickouts
+        :param soupy_links: An array of all the links (tagged 'a' in BeautifulSoup object)
+        :return: the count of the most common link in that set of links
+        """
         hrefs = list(map(lambda link: link['href'], soupy_links))
         most_common = max(set(hrefs), key=hrefs.count)
         return hrefs.count(most_common)
 
     def extract_num_paras(self):
+        """
+        Extract the number of paragraphs in a given article
+        :return: a dataframe containing ad id and the number of text blocks marked with the 'p' tag
+        """
         self.df['num_paras'] = self.df['html'].apply(lambda row: len(self.beautiful_soup(row).find_all('p')))
         return self.df[['num_paras']]
 
     def extract_words_para(self):
+        """
+        Extract the number of words per paragraph
+        :return: a dataframe containing ad id and the number of words per paragraph
+        """
         if 'num_words' not in self.df.columns.values:
             self.extract_total_words()
         if 'num_paras' not in self.df.columns.values:
@@ -106,6 +162,10 @@ class HtmlTransformer:
         return self.df[['words_para']]
 
     def extract_words_sentence(self):
+        """
+        Extract the number of words per sentence
+        :return: a dataframe containing ad id and the number of words per sentence
+        """
         if 'num_words' not in self.df.columns.values:
             self.extract_total_words()
         if 'num_sentences' not in self.df.columns.values:
@@ -114,14 +174,26 @@ class HtmlTransformer:
         return self.df[['words_sentence']]
 
     def extract_num_sentences(self):
+        """
+        Extract the number of sentences
+        :return: a dataframe containing ad id and the number of sentences
+        """
         self.df['num_sentences'] = self.df['text'].apply(lambda row: len(re.split(r'[.!?]+', row)))
         return self.df[['num_sentences']]
 
     def extract_total_words(self):
+        """
+        Extract the number of words
+        :return: a dataframe containing ad id and the number of words
+        """
         self.df['num_words'] = self.df['text'].apply(lambda row: len(re.findall(r'\w+', row)))
         return self.df[['num_words']]
 
     def extract_syllables_word(self):
+        """
+        Extract the number of syllables per word
+        :return: a dataframe containing ad id and the number of syllables per word
+        """
         if 'num_words' not in self.df.columns.values:
             self.extract_total_words()
         df_copy = self.df.copy()
@@ -130,6 +202,12 @@ class HtmlTransformer:
         return self.df[['syllables_word']]
 
     def syllable_count(self, word):
+        """
+        A helper function to count the number of syllables in a word
+        Credit https://stackoverflow.com/questions/46759492/syllable-count-in-python
+        :param word: the word needing syllables counting
+        :return: the count of syllables
+        """
         word = word.lower()
         count = 0
         vowels = 'aeiouy'
@@ -143,9 +221,12 @@ class HtmlTransformer:
         if count == 0:
             count += 1
         return count
-    # credit https://stackoverflow.com/questions/46759492/syllable-count-in-python
 
     def extract_all(self):
+        """
+        Runs all of the above functions
+        :return: a data frame with ad id and all of the above data points
+        """
         self.extract_words_sentence()
         self.extract_words_para()
         self.extract_syllables_word()
@@ -214,7 +295,18 @@ class TextProcessor:
         return pd.DataFrame(np.round(tfidf_matrix, 8), columns=vocab)
 
     def cosine_similarity(self):
-        TODO
-
-    def extract_all(self):
-        TODO
+        if 'lemmatized_headline' not in self.df.columns.values:
+            self.lemmatize()
+        headline_df = self.df.copy()
+        headline_df = headline_df.reset_index()
+        headline_values = headline_df[['ad_id', 'lemmatized_headline']].values
+        text_values = headline_df[['ad_id', 'lemmatized_text']].values
+        combined_values = []
+        for item in headline_values:
+            item[0] = item[0] + '_headline'
+            combined_values.append(item)
+        for item in text_values:
+            item[0] = item[0] + '_text'
+            combined_values.append(item)
+        combined_df = pd.DataFrame(combined_values, columns=['ad_id', 'text'])
+        print(combined_df)
