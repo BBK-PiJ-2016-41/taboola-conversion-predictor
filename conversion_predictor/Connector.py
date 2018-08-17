@@ -4,33 +4,38 @@ class Connector(ABC):
 
 
     def __init__(self):
-        TODO
+        pass
 
     @abstractmethod
     def set_start_date(self, date):
-        TODO
+        pass
 
     @abstractmethod
     def set_end_date(self, date):
-        TODO
+        pass
 
     @abstractmethod
     def get_campaign_ids(self, file):
-        TODO
+        pass
 
     @abstractmethod
     def get_data(self):
-        TODO
+        pass
         
     @abstractmethod
-    def get_credentials(self, authenticator):
-        TODO
+    def set_credentials(self, authenticator):
+        pass
+
+    def set_address(self, address):
+        pass
 
 
 class TaboolaConnector(Connector):
 
     def __init__(self):
-        TODO
+        self.address = "https://backstage.taboola.com/backstage/api/1.0/mvfglobal-network/reports/top-campaign-content/dimensions/item_breakdown"
+        self.auth = "Bearer CdAAAAAAAAAAEYHpAAAAAAAAGAEgACk6tFnBZAEAADooZTI5ODUxMWY3ODJjODZmMWQxOGUyODQ0YTMxMjA0ZThiZDAyMmQ1MkAC::56b9cb::b263aa"
+        self.campaigns = []
 
     def set_start_date(self, date):
         TODO
@@ -44,5 +49,8 @@ class TaboolaConnector(Connector):
     def get_data(self):
         TODO
 
-    def get_credentials(self, authenticator):
+    def set_credentials(self, authenticator):
+        TODO
+
+    def set_address(self, address):
         TODO
