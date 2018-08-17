@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import requests as r
 
 class Connector(ABC):
 
@@ -50,10 +51,24 @@ class TaboolaConnector(Connector):
         self.end_date = date
 
     def get_campaign_ids(self, file):
-        TODO
+        datafile = open(file, "r")
+        lines = datafile.readlines()
+        for line in lines:
+            self.campaigns.append(line)
 
     def get_data(self):
-        TODO
+        if len(self.campaigns == 0):
+            raise ValueError('Please specify a file with campaign IDs using get_campaign_ids()')
+        data = []
+        response = 0
+        header = {"Authorization": self.auth}
+        for campaign_id in self.campaigns:
+            print(f"Accessing data for campaign: {campaign_id}")
+            url = self.generate_url(campaign_id)
+            request = r.get(url, headers=header)
+            data.append(request.json())
+            response = request.status_code
+        return [response, data]
 
     def set_credentials(self, authenticator):
         self.auth = authenticator

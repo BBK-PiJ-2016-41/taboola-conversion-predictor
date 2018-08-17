@@ -33,11 +33,17 @@ class TaboolaConnectorTests(TestCase):
         self.connector.set_end_date(end_date)
         self.assertEqual(end_date, self.connector.end_date)
 
+    def test_get_campaign_ids(self):
+        self.connector.get_campaign_ids("C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\CampaignIds")
+        self.assertEqual('603254', self.connector.campaigns[0])
+
     def test_get_campaign_ids_bad_file(self):
         file = "badfile"
         with self.assertRaises(IOError):
             self.connector.get_campaign_ids(file)
 
     def test_get_data(self):
+        self.connector.get_campaign_ids(
+            "C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\CampaignIds")
         result = self.connector.get_data()
         self.assertEqual(result[0], 200)
