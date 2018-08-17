@@ -46,4 +46,5 @@ class TaboolaConnectorTests(TestCase):
         self.connector.get_campaign_ids(
             "C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\CampaignIds")
         result = self.connector.get_data()
+        print(result[1])
         self.assertEqual(result[0], 200)

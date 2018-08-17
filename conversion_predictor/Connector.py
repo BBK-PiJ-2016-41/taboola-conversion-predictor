@@ -27,7 +27,12 @@ class Connector(ABC):
     def set_credentials(self, authenticator):
         pass
 
+    @abstractmethod
     def set_address(self, address):
+        pass
+
+    @abstractmethod
+    def generate_url(self, campaign_id):
         pass
 
 
@@ -57,7 +62,7 @@ class TaboolaConnector(Connector):
             self.campaigns.append(line)
 
     def get_data(self):
-        if len(self.campaigns == 0):
+        if len(self.campaigns) == 0:
             raise ValueError('Please specify a file with campaign IDs using get_campaign_ids()')
         data = []
         response = 0
@@ -75,3 +80,6 @@ class TaboolaConnector(Connector):
 
     def set_address(self, address):
         self.address = address
+
+    def generate_url(self, campaign_id):
+        return f"{self.address}?start_date={self.start_date}&end_date={self.end_date}&campaign={campaign_id}"
