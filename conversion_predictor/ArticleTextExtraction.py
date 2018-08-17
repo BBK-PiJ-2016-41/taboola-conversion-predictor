@@ -238,6 +238,10 @@ class HtmlTransformer:
 class TextProcessor:
 
     def __init__(self, data_frame):
+        """
+        Constructor for TextProcessor.
+        :param data_frame: a data frame containing ad id, and text requiring processing
+        """
         try:
             if data_frame['text'].dtype != 'object':
                  raise ValueError('Text not expected data type - please use text object')
@@ -251,12 +255,21 @@ class TextProcessor:
         nltk.download('stopwords')
 
     def lemmatize(self):
+        """
+        A function to lemmatize words in a given text body using NLTK implementation. Lemmatizes text columns
+        with stop words removed.
+        """
         if 'stop_word_headline' not in self.df.columns.values:
             self.remove_stop_words()
         self.df['lemmatized_headline'] = self.df['stop_word_headline'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
         self.df['lemmatized_text'] = self.df['stop_word_text'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
 
     def lemmatizer(self, text):
+        """
+        A helper function for the lemmatize function - applies the lemmatization.
+        :param text: the text to be lemmatized
+        :return: the lemmatized text
+        """
         wordnet_lemmatizer = WordNetLemmatizer()
         removed_extra_spaces = word_tokenize(' '.join(list(filter(None, text.split(r'\s')))))
         words_lemmatized = []
@@ -265,10 +278,18 @@ class TextProcessor:
         return ' '.join(words_lemmatized)
 
     def remove_stop_words(self):
+        """
+        Removes stop words from given text columns. Creates new columns in the dataframe to hold them.
+        """
         self.df['stop_word_headline'] = self.df['headline_text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
         self.df['stop_word_text'] = self.df['text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
 
     def stop_word_remover(self, text):
+        """
+        A helper function for the remove stop words function.
+        :param text: the text from which stop words should be removed
+        :return: the text with stop words removed
+        """
         removed_extra_spaces = word_tokenize(' '.join(list(filter(None, text.split(r'\s')))))
         stop_words = set(stopwords.words('english'))
         words_filtered = []
@@ -278,6 +299,11 @@ class TextProcessor:
         return ' '.join(words_filtered)
 
     def tf_idf(self):
+        """
+        TF-IDF function - generates columns for each of the tokens with TF-IDF values. Treats ad text and
+        headline text separately.
+        :return: A combined dataframe with ad id and all the relevant token columns & values.
+        """
         if 'lemmatized_headline' not in self.df.columns.values:
             self.lemmatize()
         headline_df = self.df.copy()
@@ -288,6 +314,11 @@ class TextProcessor:
         return combined.join(text_array, lsuffix='_headline', rsuffix='_text')
 
     def calculate_tf_idf(self, data_frame_column):
+        """
+        A helper function for the tf_idf function.
+        :param data_frame_column: The column for which tf_idf should be calculated
+        :return: A dataframe with the TF-IDF values for that column
+        """
         vectorizer = TfidfVectorizer()
         tfidf = vectorizer.fit_transform(data_frame_column)
         tfidf_matrix = tfidf.toarray()
@@ -295,6 +326,10 @@ class TextProcessor:
         return pd.DataFrame(np.round(tfidf_matrix, 8), columns=vocab)
 
     def cosine_similarity(self):
+        """
+        Calculates cosine similarity between the headline and article text components of an ad.
+        :return: a copy of the dataframe with ad id and cosine similarity.
+        """
         if 'lemmatized_headline' not in self.df.columns.values:
             self.lemmatize()
         headline_df = self.df.copy()
