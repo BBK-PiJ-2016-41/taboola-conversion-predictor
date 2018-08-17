@@ -7,4 +7,8 @@ class CompoundFeatureCalculator:
             raise
 
     def calc_compound(self, col1, col2):
-        TODO
+        columns = self.df.columns.values
+        if col1 not in columns or col2 not in columns:
+            raise KeyError('Please specify columns contained in your dataframe: ' + ' '.join(columns))
+        self.df[col1 + '_' + col2] = self.df.apply(lambda row: (row[col1] * row[col2]), axis=1)
+        return self.df

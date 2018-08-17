@@ -8,7 +8,7 @@ class TaboolaConnectorTests(TestCase):
     def test_compound_feature_generator(self):
         test_data = pd.DataFrame({'ad_id': ['1'], 'cpc': [0.25], 'ctr': [0.10]})
         feature_calculator = CompoundFeatureCalculator(test_data)
-        self.assertEqual(0.025, )
+        self.assertEqual(0.025, feature_calculator.calc_compound('cpc', 'ctr').iloc[0]['cpc_ctr'])
 
     def test_for_ad_id(self):
         with self.assertRaises(KeyError):
@@ -18,4 +18,4 @@ class TaboolaConnectorTests(TestCase):
         test_data = pd.DataFrame({'ad_id': ['1'], 'cpc': [0.25], 'ctr': [0.10]})
         feature_calculator = CompoundFeatureCalculator(test_data)
         with self.assertRaises(KeyError):
-            self.feature_calculator.calc_compound('cpx', 'ctx')
+            feature_calculator.calc_compound('cpx', 'ctx')
