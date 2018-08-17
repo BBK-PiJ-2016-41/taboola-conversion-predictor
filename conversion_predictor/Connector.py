@@ -50,7 +50,7 @@ class TaboolaConnector(Connector):
         TODO
 
     def set_credentials(self, authenticator):
-        TODO
+        self.auth = authenticator
 
     def set_address(self, address):
         TODO

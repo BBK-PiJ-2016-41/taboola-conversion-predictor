@@ -9,10 +9,12 @@ class TaboolaConnectorTests(TestCase):
 
     def test_set_address(self):
         address = "address"
+        self.connector.set_address(address)
         self.assertEqual(address, self.connector.address)
 
     def test_set_creds(self):
         creds = "creds"
+        self.connector.set_credentials(creds)
         self.assertEqual(creds, self.connector.auth)
 
     def test_set_start_date(self):
