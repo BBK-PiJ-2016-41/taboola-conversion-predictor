@@ -56,9 +56,8 @@ class TaboolaConnector(Connector):
         self.end_date = date
 
     def get_campaign_ids(self, file):
-        #test this try catch block - if it doesn't work, it's also used in Export
+        datafile = open(file, "r")
         try:
-            datafile = open(file, "r")
             lines = datafile.readlines()
             for line in lines:
                 self.campaigns.append(line)
