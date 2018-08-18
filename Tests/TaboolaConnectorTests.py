@@ -45,6 +45,10 @@ class TaboolaConnectorTests(TestCase):
     def test_get_data(self):
         self.connector.get_campaign_ids(
             "C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\CampaignIds")
+        start_date = "2018-01-01"
+        self.connector.set_start_date(start_date)
+        end_date = "2018-01-03"
+        self.connector.set_end_date(end_date)
         result = self.connector.get_data()
         print(result[1])
         self.assertEqual(result[0], 200)

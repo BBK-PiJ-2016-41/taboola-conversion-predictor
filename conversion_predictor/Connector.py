@@ -40,7 +40,7 @@ class TaboolaConnector(Connector):
 
     def __init__(self):
         self.address = "https://backstage.taboola.com/backstage/api/1.0/mvfglobal-network/reports/top-campaign-content/dimensions/item_breakdown"
-        self.auth = "Bearer CdAAAAAAAAAAEYHpAAAAAAAAGAEgACk6tFnBZAEAADooZTI5ODUxMWY3ODJjODZmMWQxOGUyODQ0YTMxMjA0ZThiZDAyMmQ1MkAC::56b9cb::b263aa"
+        self.auth = "x"
         self.campaigns = []
         self.start_date = ""
         self.end_date = ""
@@ -76,6 +76,8 @@ class TaboolaConnector(Connector):
             print(f"Accessing data for campaign: {campaign_id}")
             url = self.generate_url(campaign_id)
             request = r.get(url, headers=header)
+            print(request.text)
+            print(request.status_code)
             data.append(request.json())
             response = request.status_code
         return [response, data]
