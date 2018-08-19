@@ -5,34 +5,72 @@ import requests as r
 class Connector(ABC):
 
     def __init__(self):
+        """
+        Constructor for the Connector class and subclasses.
+        """
         pass
 
     @abstractmethod
     def set_start_date(self, date):
+        """
+        Sets the start date for the date range required for data collection.
+        :param date: The start date
+        :return:
+        """
         pass
 
     @abstractmethod
     def set_end_date(self, date):
+        """
+        Sets the end date for the date range required for data collection.
+        :param date: The end date
+        :param date:
+        :return:
+        """
         pass
 
     @abstractmethod
     def get_campaign_ids(self, file):
+        """
+        Gets the campaign ids for campaigns required for data collection and stores in the class.
+        :param file: The name of the file in which the campaign ids are stored.
+        :return:
+        """
         pass
 
     @abstractmethod
     def get_data(self):
+        """
+        Gets the data based on the dates and campaign id specifications
+        :return: The response code of the HTTP request and the required data.
+        """
         pass
         
     @abstractmethod
     def set_credentials(self, authenticator):
+        """
+        Sets the credentials for accessing the ad platform API.
+        :param authenticator: The access token required.
+        :return:
+        """
         pass
 
     @abstractmethod
     def set_address(self, address):
+        """
+        Sets the address of the ad platform API.
+        :param address: The address required.
+        :return:
+        """
         pass
 
     @abstractmethod
     def generate_url(self, campaign_id):
+        """
+        A helper function for getting data that generates the URL to which a HTTP request is made.
+        :param campaign_id: The campaign id
+        :return: The combined URL
+        """
         pass
 
 
