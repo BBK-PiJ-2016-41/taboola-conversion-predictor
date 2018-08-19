@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 import requests as r
 
-class Connector(ABC):
 
+class Connector(ABC):
 
     def __init__(self):
         pass
