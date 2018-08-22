@@ -34,14 +34,30 @@ class UrlTransformer:
         except ValueError:
             raise
 
+        self.memo = {}
+
     def extract_html(self):
         """
         Extracts the html from the url provided.
         :return: A dataframe containing ad id and html
         """
         return_df = self.df.copy()
-        return_df['html'] = return_df['url'].apply(lambda row: requests.get(row, allow_redirects=False).text)
+        return_df['html'] = return_df['url'].apply(lambda row: self.get_html(row))
         return return_df.drop('url', axis=1)
+
+    def get_html(self, url):
+        """
+        Checks to see if the URL has been visited by the program before by checking the memo object. If it hasn't,
+        visits the URL to extract HTML.
+        :param url:
+        :return: the HTML from the webpage.
+        """
+        if url in self.memo:
+            html = self.memo[url]
+        else:
+            html = requests.get(url, allow_redirects=False).text
+            self.memo[url] = html
+        return html
 
     def extract_domains(self):
         """
