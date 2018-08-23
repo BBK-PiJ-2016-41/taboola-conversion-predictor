@@ -52,7 +52,7 @@ class Visualisation:
 
     def pairwise_correlation_matrix(self):
         """
-        Generates a pairwise correlationi matrix with the attributes in the dataframe.
+        Generates a pairwise correlation matrix with the attributes in the dataframe.
         :return:
         """
         f, ax = plt.subplots(figsize=(10, 6))
