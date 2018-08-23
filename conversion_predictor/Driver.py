@@ -47,13 +47,12 @@ def main():
         print('Extracting text comparison data...')
         text_extractor = TextProcessor(data[['headline_text', 'text']])
         data = data.join(text_extractor.cosine_similarity())
+        data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
         print(data.head())
-        token_data = text_extractor.tf_idf()
-        print(token_data.head())
+        # Option to use token data - depends on data set.
+        # token_data = text_extractor.tf_idf()
+        # print(token_data.head())
 
-
-        # prompt user for each category of feature engineering
-        # contains master dataframe - add new features after each stage of engineering
         # Once dataframe is complete, suggest options for EDA
         # Once EDA is performed, suggest options for model
         # Output relevant visualisations and model scores to command line and to file
@@ -133,7 +132,22 @@ def output_results():
 
 
 def reformat_columns(data):
-    TODO
+    # this needs testing with actual Taboola data now credentials are working
+    columns = {
+        'ctr': 'ctr',
+        'item': 'ad_id',
+        'item_name': 'headline_text',
+        'url': 'url',
+        'clicks': 'clicks',
+        'actions': 'conversions',
+        'cvr': 'cvr',
+        'cpc': 'cpc'
+    }
+    data_copy = pd.DataFrame()
+    for column in columns:
+        data_copy[columns[column]] = data[column]
+
+    return data_copy
 
 
 # class DataCollectionPrompt(Cmd):
