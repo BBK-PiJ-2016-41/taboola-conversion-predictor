@@ -90,12 +90,14 @@ class TextExtractionTester(TestCase):
 
     def setUp(self):
         url_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text': ["How Much Does Private Healthcare Actually Cost?"], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
-        transformer = UrlTransformer(url_to_test)
         url_to_test = url_to_test.set_index('ad_id')
+        transformer = UrlTransformer(url_to_test)
         html_result = transformer.extract_html()
-        html_transformer = HtmlTransformer(html_result.drop('index', axis=1))
+        html_transformer = HtmlTransformer(html_result)
         text_result = html_transformer.extract_text()
-        text_headline = text_result.join(url_to_test, on='ad_id')
+        print(text_result)
+        text_headline = text_result.join(url_to_test)
+        print(text_headline)
         self.text_processor = TextProcessor(text_headline)
 
     def test_cosine_similarity(self):

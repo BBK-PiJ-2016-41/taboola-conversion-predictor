@@ -267,9 +267,7 @@ class TextProcessor:
         """
         try:
             if data_frame['text'].dtype != 'object':
-                 raise ValueError('Text not expected data type - please use text object')
-            if 'ad_id' != data_frame.index.name:
-                raise KeyError('Ad ID not found as index')
+                raise ValueError('Text not expected data type - please use text object')
             self.df = data_frame
         except KeyError:
             raise
@@ -376,4 +374,5 @@ class TextProcessor:
         copy_df['cosine_similarity'] = copy_df['ad_id'].apply(lambda row:
                                                 similarity_df.iloc[tf_idf.loc[tf_idf['ad_id'] == str(row) + '_headline']
                                                 .index[0]][tf_idf.loc[tf_idf['ad_id'] == str(row) + '_text'].index[0]])
-        return copy_df[['ad_id', 'cosine_similarity']]
+        copy_df.set_index('ad_id', inplace=True)
+        return copy_df[['cosine_similarity']]
