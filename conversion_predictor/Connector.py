@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import requests as r
+from conversion_predictor.TokenRefresher import TaboolaTokenRefresher
 
 
 class Connector(ABC):
@@ -77,8 +78,10 @@ class Connector(ABC):
 class TaboolaConnector(Connector):
 
     def __init__(self):
+        super().__init__()
         self.address = "https://backstage.taboola.com/backstage/api/1.0/mvfglobal-network/reports/top-campaign-content/dimensions/item_breakdown"
-        self.auth = "x"
+        token_refresher = TaboolaTokenRefresher()
+        self.auth = token_refresher.refresh_tokens()[1]
         self.campaigns = []
         self.start_date = ""
         self.end_date = ""

@@ -1,4 +1,4 @@
-from conversion_predictor.TaboolaTokenRefresher import TaboolaTokenRefresher
+from conversion_predictor.TokenRefresher import TaboolaTokenRefresher
 from unittest import TestCase
 
 

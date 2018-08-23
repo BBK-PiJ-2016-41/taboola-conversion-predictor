@@ -1,17 +1,30 @@
 import requests as r
+from abc import ABC, abstractmethod
 
 
-class TaboolaTokenRefresher:
+class TokenRefresher(ABC):
+
+    def __init__(self):
+        pass
+
+    @abstractmethod
+    def refresh_tokens(self):
+        pass
+
+
+class TaboolaTokenRefresher(TokenRefresher):
 
     def __init__(self, advertiser='mvfglobal-network'):
         """
         Constructor class for Taboola Token Refresher.
         """
+        super().__init__()
         self.advertiser = advertiser
         self.client_id = ''
         self.client_secret = ''
 
     def refresh_tokens(self):
+        self.get_client_credentials()
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded'
         }
