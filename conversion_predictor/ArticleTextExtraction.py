@@ -26,9 +26,7 @@ class UrlTransformer:
         try:
             if data_frame['url'].dtype != 'object':
                 raise ValueError('URL not expected data type - please use text object')
-            if 'ad_id' not in data_frame.columns.values:
-                raise KeyError('Ad ID not found')
-            self.df = data_frame.reset_index()
+            self.df = data_frame
         except KeyError:
             raise
         except ValueError:
@@ -73,7 +71,6 @@ class UrlTransformer:
         feature_labels = list(gle.classes_)
         features_final = pd.DataFrame(feature_array, columns=feature_labels)
         combined = pd.merge(df_copy, features_final, left_index=True, right_index=True)
-        combined.set_index('ad_id')
         return combined.drop('domain_label', axis=1)
 
     def trim_domains(self):
@@ -98,7 +95,7 @@ class HtmlTransformer:
         try:
             if data_frame['html'].dtype != 'object':
                 raise ValueError('HTML not expected data type - please use text object')
-            self.df = data_frame.set_index('ad_id')
+            self.df = data_frame
         except KeyError:
             raise
         except ValueError:
@@ -154,7 +151,10 @@ class HtmlTransformer:
         :return: the count of the most common link in that set of links
         """
         hrefs = list(map(lambda link: link['href'], soupy_links))
-        most_common = max(set(hrefs), key=hrefs.count)
+        try:
+            most_common = max(set(hrefs), key=hrefs.count)
+        except ValueError:
+            return None
         return hrefs.count(most_common)
 
     def extract_num_paras(self):
@@ -224,6 +224,8 @@ class HtmlTransformer:
         :param word: the word needing syllables counting
         :return: the count of syllables
         """
+        if len(word) == 0:
+            return 0
         word = word.lower()
         count = 0
         vowels = 'aeiouy'
@@ -274,11 +276,12 @@ class TextProcessor:
         """
         A function to lemmatize words in a given text body using NLTK implementation. Lemmatizes text columns
         with stop words removed.
+        :return: a copy of the dataframe with lemmatization performed
         """
-        if 'stop_word_headline' not in self.df.columns.values:
-            self.remove_stop_words()
-        self.df['lemmatized_headline'] = self.df['stop_word_headline'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
-        self.df['lemmatized_text'] = self.df['stop_word_text'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy = self.remove_stop_words().copy()
+        df_copy['lemmatized_headline'] = df_copy['stop_word_headline'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy['lemmatized_text'] = df_copy['stop_word_text'].apply(lambda row: self.lemmatizer(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        return df_copy
 
     def lemmatizer(self, text):
         """
@@ -296,9 +299,12 @@ class TextProcessor:
     def remove_stop_words(self):
         """
         Removes stop words from given text columns. Creates new columns in the dataframe to hold them.
+        :return the dataframe containing the text fields with stop words removed
         """
-        self.df['stop_word_headline'] = self.df['headline_text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
-        self.df['stop_word_text'] = self.df['text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy = self.df.copy()
+        df_copy['stop_word_headline'] = df_copy['headline_text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy['stop_word_text'] = df_copy['text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        return df_copy
 
     def stop_word_remover(self, text):
         """
@@ -320,9 +326,7 @@ class TextProcessor:
         headline text separately.
         :return: A combined dataframe with ad id and all the relevant token columns & values.
         """
-        if 'lemmatized_headline' not in self.df.columns.values:
-            self.lemmatize()
-        headline_df = self.df.copy()
+        headline_df = self.lemmatize().copy()
         headline_df = headline_df.reset_index()
         headline_array = self.calculate_tf_idf(headline_df['lemmatized_headline'])
         text_array = self.calculate_tf_idf(headline_df['lemmatized_text'])
@@ -346,18 +350,16 @@ class TextProcessor:
         Calculates cosine similarity between the headline and article text components of an ad.
         :return: a copy of the dataframe with ad id and cosine similarity.
         """
-        if 'lemmatized_headline' not in self.df.columns.values:
-            self.lemmatize()
-        headline_df = self.df.copy()
+        headline_df = self.lemmatize()
         headline_df = headline_df.reset_index()
         headline_values = headline_df[['ad_id', 'lemmatized_headline']].values
         text_values = headline_df[['ad_id', 'lemmatized_text']].values
         combined_values = []
         for item in headline_values:
-            item[0] = item[0] + '_headline'
+            item[0] = str(item[0]) + '_headline'
             combined_values.append(item)
         for item in text_values:
-            item[0] = item[0] + '_text'
+            item[0] = str(item[0]) + '_text'
             combined_values.append(item)
         combined_df = pd.DataFrame(combined_values, columns=['ad_id', 'text'])
         tf_idf = self.calculate_tf_idf(combined_df['text'])
@@ -366,5 +368,7 @@ class TextProcessor:
         similarity_matrix = cosine_similarity(tf_idf.drop('ad_id', axis=1))
         similarity_df = pd.DataFrame(similarity_matrix)
         copy_df = self.df.reset_index()
-        copy_df['cosine_similarity'] = copy_df['ad_id'].apply(lambda row: similarity_df.iloc[tf_idf.loc[tf_idf['ad_id'] == row + '_headline'].index[0]][tf_idf.loc[tf_idf['ad_id'] == row + '_text'].index[0]])
+        copy_df['cosine_similarity'] = copy_df['ad_id'].apply(lambda row:
+                                                similarity_df.iloc[tf_idf.loc[tf_idf['ad_id'] == str(row) + '_headline']
+                                                .index[0]][tf_idf.loc[tf_idf['ad_id'] == str(row) + '_text'].index[0]])
         return copy_df[['ad_id', 'cosine_similarity']]

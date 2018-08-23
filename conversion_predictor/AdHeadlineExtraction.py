@@ -14,12 +14,12 @@ class AdExtractor:
         try:
             if data_frame['headline_text'].dtype != 'object':
                 raise ValueError('Headline text not expected data type - please use text object')
-            self.df = data_frame.set_index('ad_id')
         except KeyError:
             raise
         except ValueError:
             raise
 
+        self.df = data_frame
         self.punctuation = r'[,?!.:;&]'
 
     def num_dynamic_params(self):
@@ -48,4 +48,4 @@ class AdExtractor:
         :return: a dataframe containing the ad_id and, number of dynamic parameters and number of punctuation marks
         contained in the text, without the headline_text column
         """
-        return self.num_dynamic_params().join(self.num_punc_marks(), on='ad_id')
+        return self.num_dynamic_params().join(self.num_punc_marks())
