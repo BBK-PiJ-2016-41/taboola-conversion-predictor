@@ -62,7 +62,7 @@ class UrlTransformer:
         Creates a category for each domain in the dataframe using One Hot Encoder
         :return: a dataframe containing ad id and categorical representations of each domain
         """
-        df_copy = self.trim_domains()
+        df_copy = self.trim_domains().copy().reset_index()
         gle = LabelEncoder()
         labels = gle.fit_transform(df_copy['domain'])
         df_copy['domain_label'] = labels
@@ -71,6 +71,7 @@ class UrlTransformer:
         feature_labels = list(gle.classes_)
         features_final = pd.DataFrame(feature_array, columns=feature_labels)
         combined = pd.merge(df_copy, features_final, left_index=True, right_index=True)
+        combined.set_index('ad_id', inplace=True)
         return combined.drop('domain_label', axis=1)
 
     def trim_domains(self):

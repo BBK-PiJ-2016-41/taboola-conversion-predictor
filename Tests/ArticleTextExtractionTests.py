@@ -32,8 +32,16 @@ class UrlTester(TestCase):
         url_to_test = pd.DataFrame({'ad_id': ['1'], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
         transformer = UrlTransformer(url_to_test)
         result = transformer.extract_domains()
+        print(result)
         self.assertEquals(1.0, result.iloc[0]['expertsinmoney'])
-        self.assertTrue('ad_id' in result.columns.values)
+
+    def test_multiple_urls(self):
+        test_df = pd.read_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestDomainExtractor.csv')
+        test_df.set_index('ad_id', inplace=True)
+        #print(test_df)
+        transformer = UrlTransformer(test_df)
+        result = transformer.extract_domains()
+        print(result)
 
 
 class HtmlTester(TestCase):
