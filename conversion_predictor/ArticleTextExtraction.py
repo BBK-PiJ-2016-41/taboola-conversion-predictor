@@ -80,7 +80,7 @@ class UrlTransformer:
         """
         df_copy = self.df.copy()
         df_copy['domain'] = df_copy['url'].apply(lambda row: parse.urlparse(row).netloc.split('.')[1])
-        return df_copy.drop('url', axis=1)
+        return df_copy[['domain']]
 
 
 class HtmlTransformer:
@@ -108,7 +108,8 @@ class HtmlTransformer:
         Extracts the text from the raw html provided
         :return: a dataframe containing ad id and text
         """
-        self.df['text'] = self.df['html'].apply(lambda row: self.cleanup(row))
+        if 'text' not in self.df.columns.values:
+            self.df['text'] = self.df['html'].apply(lambda row: self.cleanup(row))
         return self.df[['text']]
 
     def beautiful_soup(self, html_snippet):
@@ -245,12 +246,15 @@ class HtmlTransformer:
         Runs all of the above functions
         :return: a data frame with ad id and all of the above data points
         """
+        self.extract_total_words()
+        self.extract_num_sentences()
+        self.extract_num_paras()
         self.extract_words_sentence()
         self.extract_words_para()
         self.extract_syllables_word()
-        self.extract_num_paras()
         self.extract_clickouts()
-        return self.df
+        return self.df[['num_clickouts', 'words_sentence', 'words_para', 'syllables_word',
+                        'num_paras', 'num_words', 'num_sentences']]
 
 
 class TextProcessor:

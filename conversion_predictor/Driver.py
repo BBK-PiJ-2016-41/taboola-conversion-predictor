@@ -39,17 +39,17 @@ def main():
         data = data.join(ad_extractor.run_all())
         print('Extracting features from URL...')
         url_extractor = UrlTransformer(data[['url']])
-        html_data = url_extractor.extract_html()
         data = data.join(url_extractor.extract_domains(), on='ad_id')
+        html_data = url_extractor.extract_html()
         print('Extracting features from HTML...')
         html_extractor = HtmlTransformer(html_data)
         data = data.join(html_extractor.extract_all())
         print('Extracting text comparison data...')
-        text_extractor = TextProcessor(data[['headline_text', 'text']])
+        text_extractor = TextProcessor(data[['headline_text']].join(html_extractor.extract_text()))
         data = data.join(text_extractor.cosine_similarity())
         data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
         print(data.head())
-        # Option to use token data - depends on data set.
+        # Option to use token data - depends on data set. Could rearrange to just do it for ad headline?
         # token_data = text_extractor.tf_idf()
         # print(token_data.head())
 
