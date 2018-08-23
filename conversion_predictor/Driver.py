@@ -2,6 +2,8 @@ import pandas as pd
 from conversion_predictor.Connector import TaboolaConnector
 import cmd as Cmd
 import sys
+from conversion_predictor.AdHeadlineExtraction import AdExtractor
+from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
 
 
 def main():
@@ -11,17 +13,44 @@ def main():
 
         # User should select ad platform
         data_option = run_data_collection_preamble()
-        data = 0
         if data_option == 'T':
             data = run_extraction('Taboola')
+            data = reformat_columns(data)
+            data.set_index('ad_id')
         else:
-            print('We\'ll need you to specify a file containing Ad ID, Headline, URL, CPC, CTR, Conversion Rate.')
+            # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
+            # data_file = 'C:\Users\Kathryn\Documents\Birkbeck\MSc Project'
+            #         # data_frame = pd.read_csv(data_file)
+            print('We\'ll need you to specify a file containing the columns ad_id, headline_text, url, cpc, ctr, cvr.')
             file_name = input('Please enter the full path of the file containing your ad data.').replace('\\', '\\\\')
-            data = pd.read_csv(file_name)
 
-        # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
-        # data_file = 'C:\\Users\\Kathryn\\Documents\\Birkbeck\\MSc Project\\DataOutputSkeleton.csv'
-        #         # data_frame = pd.read_csv(data_file)
+        try:
+            data = pd.read_csv(file_name, index_col='ad_id')
+        except FileNotFoundError:
+            print('Please specify an existing file.')
+
+        print('This is a sample of the data we will be analysing:')
+        print(data.head())
+        print('Extracting features from ad headline....')
+        try:
+            ad_extractor = AdExtractor(data[['headline_text']])
+        except KeyError:
+            print('Please make sure your file contains the following columns: columns ad_id, headline_text, url, cpc, ctr, cvr')
+        data = data.join(ad_extractor.run_all())
+        print('Extracting features from URL...')
+        url_extractor = UrlTransformer(data[['url']])
+        html_data = url_extractor.extract_html()
+        data = data.join(url_extractor.extract_domains(), on='ad_id')
+        print('Extracting features from HTML...')
+        html_extractor = HtmlTransformer(html_data)
+        data = data.join(html_extractor.extract_all())
+        print('Extracting text comparison data...')
+        text_extractor = TextProcessor(data[['headline_text', 'text']])
+        data = data.join(text_extractor.cosine_similarity())
+        print(data.head())
+        token_data = text_extractor.tf_idf()
+        print(token_data.head())
+
 
         # prompt user for each category of feature engineering
         # contains master dataframe - add new features after each stage of engineering
@@ -66,24 +95,29 @@ def run_extraction(platform):
         connector = getattr(sys.modules[__name__], class_name)
     except AttributeError:
         'The connector you have tried to access does not exist.'
-
+    auth = get_auth(platform)
     start_date = input('Please enter the start date in the format YYYY-MM-DD')
     end_date = input('Please enter the end date in the format YYYY-MM-DD')
-    auth = input('Please provide your access token.')
     print('Please provide a text file containing the IDs of the campaigns you would like to analyse.'
           'For best results, provide IDs of English campaigns only.')
     campaign_ids_file = input('Please enter the full file path:')
     connector.set_start_date(start_date)
     connector.set_end_date(end_date)
-    connector.set_credentials(auth)
     connector.get_campaign_ids(campaign_ids_file)
+    connector.set_credentials(auth)
     return connector.get_data()
     # user should provide date range, relevant credentials
     # User should specify file containing campaign IDs (should be English only)
 
 
-def run_feature_engineering():
-    TODO
+def get_auth(platform):
+    class_name = platform + 'TokenRefresher'
+    try:
+        token_extractor = getattr(sys.modules[__name__], class_name)
+    except AttributeError:
+        'The connector you have tried to access does not exist.'
+
+    return token_extractor.refresh_tokens()[1]
 
 
 def run_eda():
@@ -95,6 +129,10 @@ def run_regression():
 
 
 def output_results():
+    TODO
+
+
+def reformat_columns(data):
     TODO
 
 
