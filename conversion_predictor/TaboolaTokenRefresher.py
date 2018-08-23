@@ -12,20 +12,13 @@ class TaboolaTokenRefresher:
         self.client_secret = client_secret
 
     def refresh_tokens(self):
-        payload = {
-            'client_id': self.client_id,
-            'client_secret': self.client_secret,
-            'username': 'x',
-            'password': 'x',
-            'grant_type': 'password'
-        }
-        options = {
-            'payload': payload
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
         }
         request = r.post('https://backstage.taboola.com/backstage/oauth/token?client_id=' + self.client_id +
                          '&client_secret=' + self.client_secret +
-                         'username=x&password=x&grant_type=password')
-        data = 'Bearer ' + request.text
-        print(data)
+                         '&grant_type=client_credentials', headers=headers)
+        json = request.json()
+        data = 'Bearer ' + json['access_token']
         response = request.status_code
         return [response, data]
