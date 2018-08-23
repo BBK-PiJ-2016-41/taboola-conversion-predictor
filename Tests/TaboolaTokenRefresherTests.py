@@ -5,7 +5,6 @@ from unittest import TestCase
 class TaboolaTokenRefresherTests(TestCase):
 
     def test_status_code(self):
-        token_refresher = TaboolaTokenRefresher(
-            'mvfglobal-network', 'x', 'x')
+        token_refresher = TaboolaTokenRefresher()
         result = token_refresher.refresh_tokens()
         self.assertEqual(200, result[0])
