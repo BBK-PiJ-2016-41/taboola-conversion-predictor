@@ -1,9 +1,11 @@
 import pandas as pd
 from conversion_predictor.Connector import TaboolaConnector
-import cmd as Cmd
+import cmd as cmd
 import sys
 from conversion_predictor.AdHeadlineExtraction import AdExtractor
 from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
+from conversion_predictor.DataExploration import DataExploration
+from conversion_predictor.Model import Visualisation, LinearRegression, LassoRegressionModel, RidgeRegressionModel
 
 
 def main():
@@ -54,6 +56,13 @@ def main():
         # print(token_data.head())
 
         # Once dataframe is complete, suggest options for EDA
+        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
+        data.drop('headline_text', axis=1)
+        data.drop('url', axis=1)
+        data.drop('domain', axis=1)
+        viz = Visualisation(data)
+        command_interpreter = DataExploration(viz)
+        command_interpreter.cmdloop()
         # Once EDA is performed, suggest options for model
         # Output relevant visualisations and model scores to command line and to file
 
@@ -148,10 +157,6 @@ def reformat_columns(data):
         data_copy[columns[column]] = data[column]
 
     return data_copy
-
-
-# class DataCollectionPrompt(Cmd):
-#     TODO
 
 
 if __name__ == '__main__':
