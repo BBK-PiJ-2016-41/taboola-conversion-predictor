@@ -128,10 +128,6 @@ def get_auth(platform):
     return token_extractor.refresh_tokens()[1]
 
 
-def run_eda():
-    TODO
-
-
 def run_regression():
     TODO
 
