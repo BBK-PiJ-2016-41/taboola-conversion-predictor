@@ -14,7 +14,7 @@ class VisualisationTests(TestCase):
         target = target.drop('page_text', 1)
         target = target.drop('headline', 1)
         target = target.apply(pd.to_numeric)
-        self.model = Visualisation(target, 'cvr')
+        self.model = Visualisation(target)
 
     def test_data_head(self):
         self.model.head()
