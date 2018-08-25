@@ -166,7 +166,8 @@ class LinearRegressionModel(BasicModel):
         self.lm.predict(self.X_test)
 
     def score(self):
-        self.score = self.lm.score(self.X_test, self.y_test)
+        score = self.lm.score(self.X_test, self.y_test)
+        print(score)
         return self.score
 
 
@@ -186,7 +187,9 @@ class LassoRegressionModel(BasicModel):
         self.lm.predict(self.X_test)
 
     def score(self):
-        self.lm.score(self.X_test, self.y_test)
+        score = self.lm.score(self.X_test, self.y_test)
+        print(score)
+        return score
 
     def reset_alpha(self, alpha):
         """
@@ -213,6 +216,7 @@ class RidgeRegressionModel(BasicModel):
 
     def score(self):
         score = self.rm.score(self.X_test, self.y_test)
+        print(score)
         return score
 
     def reset_alpha(self, alpha):

@@ -1,11 +1,10 @@
 import pandas as pd
-from conversion_predictor.Connector import TaboolaConnector
-import cmd as cmd
 import sys
 from conversion_predictor.AdHeadlineExtraction import AdExtractor
 from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
 from conversion_predictor.DataExploration import DataExploration
-from conversion_predictor.Model import Visualisation, LinearRegression, LassoRegressionModel, RidgeRegressionModel
+from conversion_predictor.ModelExploration import ModelExploration
+from conversion_predictor.Model import Visualisation, LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
 
 
 def main():
@@ -21,8 +20,6 @@ def main():
             data.set_index('ad_id')
         else:
             # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
-            # data_file = 'C:\Users\Kathryn\Documents\Birkbeck\MSc Project'
-            #         # data_frame = pd.read_csv(data_file)
             print('We\'ll need you to specify a file containing the columns ad_id, headline_text, url, cpc, ctr, cvr.')
             file_name = input('Please enter the full path of the file containing your ad data.').replace('\\', '\\\\')
 
@@ -33,38 +30,37 @@ def main():
 
         print('This is a sample of the data we will be analysing:')
         print(data.head())
-        print('Extracting features from ad headline....')
-        try:
-            ad_extractor = AdExtractor(data[['headline_text']])
-        except KeyError:
-            print('Please make sure your file contains the following columns: columns ad_id, headline_text, url, cpc, ctr, cvr')
-        data = data.join(ad_extractor.run_all())
-        print('Extracting features from URL...')
-        url_extractor = UrlTransformer(data[['url']])
-        data = data.join(url_extractor.extract_domains(), on='ad_id')
-        html_data = url_extractor.extract_html()
-        print('Extracting features from HTML...')
-        html_extractor = HtmlTransformer(html_data)
-        data = data.join(html_extractor.extract_all())
-        print('Extracting text comparison data...')
-        text_extractor = TextProcessor(data[['headline_text']].join(html_extractor.extract_text()))
-        data = data.join(text_extractor.cosine_similarity())
-        data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
-        print(data.head())
+
         # Option to use token data - depends on data set. Could rearrange to just do it for ad headline?
         # token_data = text_extractor.tf_idf()
         # print(token_data.head())
-
+        processed_data = run_preprocessing(data)
         # Once dataframe is complete, suggest options for EDA
         print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
-        data.drop('headline_text', axis=1)
-        data.drop('url', axis=1)
-        data.drop('domain', axis=1)
-        viz = Visualisation(data)
+        processed_data.drop('headline_text', axis=1)
+        processed_data.drop('url', axis=1)
+        processed_data.drop('domain', axis=1)
+        viz = Visualisation(processed_data)
         command_interpreter = DataExploration(viz)
         command_interpreter.cmdloop()
         # Once EDA is performed, suggest options for model
-        # Output relevant visualisations and model scores to command line and to file
+        print('You now have several options for regression analysis. The train/test split is set to 0.3')
+        regression_type = 1
+        while regression_type == 1:
+            regression_type = input('Please enter Linear, Ridge or Lasso, or 0 to exit the regression phase: ')
+            if regression_type == 'Lasso':
+                model = LassoRegressionModel(processed_data, 'cvr')
+            elif regression_type == 'Ridge':
+                model = RidgeRegressionModel(processed_data, 'cvr')
+            elif regression_type == 'Linear':
+                model = LinearRegressionModel(processed_data, 'cvr')
+            else:
+                continue
+            model_explorer = ModelExploration(model)
+            model_explorer.cmdloop()
+
+        output_file = input('Please specify the file you would like to output your data to.')
+        processed_data.to_csv(output_file)
 
 
 def display_intro_text():
@@ -128,8 +124,26 @@ def get_auth(platform):
     return token_extractor.refresh_tokens()[1]
 
 
-def run_regression():
-    TODO
+def run_preprocessing(data):
+    print('Extracting features from ad headline....')
+    try:
+        ad_extractor = AdExtractor(data[['headline_text']])
+    except KeyError:
+        print('Please make sure your file contains the following columns: '
+              'columns ad_id, headline_text, url, cpc, ctr, cvr')
+    data = data.join(ad_extractor.run_all())
+    print('Extracting features from URL...')
+    url_extractor = UrlTransformer(data[['url']])
+    data = data.join(url_extractor.extract_domains(), on='ad_id')
+    html_data = url_extractor.extract_html()
+    print('Extracting features from HTML...')
+    html_extractor = HtmlTransformer(html_data)
+    data = data.join(html_extractor.extract_all())
+    print('Extracting text comparison data...')
+    text_extractor = TextProcessor(data[['headline_text']].join(html_extractor.extract_text()))
+    data = data.join(text_extractor.cosine_similarity())
+    # data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
+    return data
 
 
 def output_results():
