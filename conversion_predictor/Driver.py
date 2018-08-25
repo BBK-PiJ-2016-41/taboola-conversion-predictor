@@ -1,5 +1,7 @@
 import pandas as pd
 import sys
+from conversion_predictor.Connector import TaboolaConnector
+from conversion_predictor.TokenRefresher import TaboolaTokenRefresher
 from conversion_predictor.AdHeadlineExtraction import AdExtractor
 from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
 from conversion_predictor.DataExploration import DataExploration
@@ -36,10 +38,12 @@ def main():
         # print(token_data.head())
         processed_data = run_preprocessing(data)
         # Once dataframe is complete, suggest options for EDA
-        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
         processed_data.drop('headline_text', axis=1)
         processed_data.drop('url', axis=1)
         processed_data.drop('domain', axis=1)
+        processed_data = processed_data.apply(pd.to_numeric)
+        processed_data = processed_data.fillna(processed_data.mean())
+        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
         viz = Visualisation(processed_data)
         command_interpreter = DataExploration(viz)
         command_interpreter.cmdloop()
@@ -96,7 +100,7 @@ def run_data_collection_preamble():
 def run_extraction(platform):
     class_name = platform + 'Connector'
     try:
-        connector = getattr(sys.modules[__name__], class_name)
+        connector = getattr(sys.modules[__name__], class_name)()
     except AttributeError:
         'The connector you have tried to access does not exist.'
     auth = get_auth(platform)
@@ -117,10 +121,9 @@ def run_extraction(platform):
 def get_auth(platform):
     class_name = platform + 'TokenRefresher'
     try:
-        token_extractor = getattr(sys.modules[__name__], class_name)
+        token_extractor = getattr(sys.modules[__name__], class_name)()
     except AttributeError:
         'The connector you have tried to access does not exist.'
-
     return token_extractor.refresh_tokens()[1]
 
 

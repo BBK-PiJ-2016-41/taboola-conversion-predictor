@@ -80,11 +80,10 @@ class TaboolaConnector(Connector):
     def __init__(self):
         super().__init__()
         self.address = "https://backstage.taboola.com/backstage/api/1.0/mvfglobal-network/reports/top-campaign-content/dimensions/item_breakdown"
-        token_refresher = TaboolaTokenRefresher()
-        self.auth = token_refresher.refresh_tokens()[1]
         self.campaigns = []
-        self.start_date = ""
-        self.end_date = ""
+        self.auth = ''
+        self.start_date = ''
+        self.end_date = ''
 
     def set_start_date(self, date):
         if len(date) != 10 or '-' not in date:
