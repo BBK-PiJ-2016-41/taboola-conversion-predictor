@@ -116,9 +116,7 @@ class TaboolaConnector(Connector):
             print(f"Accessing data for campaign: {campaign_id}")
             url = self.generate_url(campaign_id)
             request = r.get(url, headers=header)
-            print(request.text)
-            print(request.status_code)
-            data.append(request.json())
+            data.append(request.json()['results'][0])
             response = request.status_code
         return [response, data]
 

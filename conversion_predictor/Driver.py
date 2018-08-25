@@ -17,18 +17,17 @@ def main():
         # User should select ad platform
         data_option = run_data_collection_preamble()
         if data_option == 'T':
-            data = run_extraction('Taboola')
+            data = pd.DataFrame(run_extraction('Taboola'))
             data = reformat_columns(data)
-            data.set_index('ad_id')
+            data.set_index('ad_id', inplace=True)
         else:
             # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
             print('We\'ll need you to specify a file containing the columns ad_id, headline_text, url, cpc, ctr, cvr.')
             file_name = input('Please enter the full path of the file containing your ad data.').replace('\\', '\\\\')
-
-        try:
-            data = pd.read_csv(file_name, index_col='ad_id')
-        except FileNotFoundError:
-            print('Please specify an existing file.')
+            try:
+                data = pd.read_csv(file_name, index_col='ad_id')
+            except FileNotFoundError:
+                print('Please specify an existing file.')
 
         print('This is a sample of the data we will be analysing:')
         print(data.head())
@@ -113,7 +112,7 @@ def run_extraction(platform):
     connector.set_end_date(end_date)
     connector.get_campaign_ids(campaign_ids_file)
     connector.set_credentials(auth)
-    return connector.get_data()
+    return connector.get_data()[1]
     # user should provide date range, relevant credentials
     # User should specify file containing campaign IDs (should be English only)
 
@@ -154,7 +153,6 @@ def output_results():
 
 
 def reformat_columns(data):
-    # this needs testing with actual Taboola data now credentials are working
     columns = {
         'ctr': 'ctr',
         'item': 'ad_id',
