@@ -3,6 +3,7 @@ import sys
 from conversion_predictor.Connector import TaboolaConnector
 from conversion_predictor.TokenRefresher import TaboolaTokenRefresher
 from conversion_predictor.AdHeadlineExtraction import AdExtractor
+from conversion_predictor.CompoundFeatureCalculator import CompoundFeatureCalculator
 from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
 from conversion_predictor.DataExploration import DataExploration
 from conversion_predictor.ModelExploration import ModelExploration
@@ -134,6 +135,8 @@ def run_preprocessing(data):
         print('Please make sure your file contains the following columns: '
               'columns ad_id, headline_text, url, cpc, ctr, cvr')
     data = data.join(ad_extractor.run_all())
+    compound_calc = CompoundFeatureCalculator(data)
+    data = data.join(compound_calc.calc_compound('cpc', 'ctr'))
     print('Extracting features from URL...')
     url_extractor = UrlTransformer(data[['url']])
     data = data.join(url_extractor.extract_domains(), on='ad_id')
