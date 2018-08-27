@@ -24,8 +24,13 @@ def main():
         data_option = run_data_collection_preamble()
         platform = switcher(data_option)
         if platform != 'File':
-            data = pd.DataFrame(run_extraction(
-                connector_factory.get_object(platform), token_factory.get_object(platform)))
+            try:
+                connector = connector_factory.get_object(platform)
+                token_refresher = token_factory.get_object(platform)
+            except AttributeError:
+                print('The platform you have selected is not supported.')
+
+            data = pd.DataFrame(run_extraction(connector, token_refresher))
             data = reformat_columns(data)
             data.set_index('ad_id', inplace=True)
         else:
