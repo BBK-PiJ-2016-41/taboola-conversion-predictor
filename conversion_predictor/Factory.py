@@ -35,7 +35,7 @@ class Factory(ABC):
         :return:
         """
         try:
-            return getattr(sys.modules[__name__], platform + type)
+            return getattr(sys.modules[__name__], platform + self.type)
         except AttributeError:
             raise
 
