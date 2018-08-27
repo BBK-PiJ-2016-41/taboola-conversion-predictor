@@ -42,15 +42,12 @@ def main():
 
         processed_data = run_preprocessing(data)
         # Once dataframe is complete, suggest options for EDA
-        processed_data = processed_data.drop('headline_text', axis=1)
-        processed_data = processed_data.drop('url', axis=1)
-        processed_data = processed_data.drop('domain', axis=1)
-        processed_data = processed_data.apply(pd.to_numeric)
-        processed_data = processed_data.fillna(processed_data.mean())
+
         print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
         viz = Visualisation(processed_data)
         command_interpreter = DataExploration(viz)
         command_interpreter.cmdloop()
+
         # Once EDA is performed, suggest options for model
         print('You now have several options for regression analysis. The train/test split is set to 0.3')
         regression_type = 1
@@ -139,8 +136,12 @@ def run_preprocessing(data):
     token_data = text_extractor.tf_idf()
     data = data.join(text_extractor.cosine_similarity())
     data = data.join(token_data, rsuffix='_hl')
-    data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
-    return data
+    processed_data = data.drop('headline_text', axis=1)
+    processed_data = processed_data.drop('url', axis=1)
+    processed_data = processed_data.drop('domain', axis=1)
+    processed_data = processed_data.apply(pd.to_numeric)
+    processed_data = processed_data.fillna(processed_data.mean())
+    return processed_data
 
 
 def switcher(input):
