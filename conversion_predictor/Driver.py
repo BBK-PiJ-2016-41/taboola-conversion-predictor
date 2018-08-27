@@ -22,8 +22,10 @@ def main():
 
         # User should select ad platform
         data_option = run_data_collection_preamble()
-        if data_option == 'T':
-            data = pd.DataFrame(run_extraction(connector_factory.get_object('Taboola'), token_factory.get_object('Taboola')))
+        platform = switcher(data_option)
+        if platform != 'File':
+            data = pd.DataFrame(run_extraction(
+                connector_factory.get_object(platform), token_factory.get_object(platform)))
             data = reformat_columns(data)
             data.set_index('ad_id', inplace=True)
         else:
@@ -139,6 +141,14 @@ def run_preprocessing(data):
     data = data.join(token_data, rsuffix='_hl')
     data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
     return data
+
+
+def switcher(input):
+    dictionary = {
+        'T': 'Taboola',
+        'F': 'File'
+    }
+    return dictionary.get('T', 'File')
 
 
 def output_results():
