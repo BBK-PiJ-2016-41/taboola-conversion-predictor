@@ -8,6 +8,7 @@ from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTrans
 from conversion_predictor.DataExploration import DataExploration
 from conversion_predictor.ModelExploration import ModelExploration
 from conversion_predictor.Model import Visualisation, LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
+from conversion_predictor.Factory import ConnectorFactory, TokenRefresherFactory
 
 
 def main():
@@ -15,10 +16,14 @@ def main():
         display_intro_text()
         response = input('(please press any key to continue)')
 
+        # Instantiate factories for ad platform access
+        connector_factory = ConnectorFactory()
+        token_factory = TokenRefresherFactory()
+
         # User should select ad platform
         data_option = run_data_collection_preamble()
         if data_option == 'T':
-            data = pd.DataFrame(run_extraction('Taboola'))
+            data = pd.DataFrame(run_extraction(connector_factory.get_object('Taboola'), token_factory.get_object('Taboola')))
             data = reformat_columns(data)
             data.set_index('ad_id', inplace=True)
         else:
@@ -33,14 +38,11 @@ def main():
         print('This is a sample of the data we will be analysing:')
         print(data.head())
 
-        # Option to use token data - depends on data set. Could rearrange to just do it for ad headline?
-        # token_data = text_extractor.tf_idf()
-        # print(token_data.head())
         processed_data = run_preprocessing(data)
         # Once dataframe is complete, suggest options for EDA
-        processed_data.drop('headline_text', axis=1)
-        processed_data.drop('url', axis=1)
-        processed_data.drop('domain', axis=1)
+        processed_data = processed_data.drop('headline_text', axis=1)
+        processed_data = processed_data.drop('url', axis=1)
+        processed_data = processed_data.drop('domain', axis=1)
         processed_data = processed_data.apply(pd.to_numeric)
         processed_data = processed_data.fillna(processed_data.mean())
         print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
@@ -97,13 +99,8 @@ def run_data_collection_preamble():
     return response
 
 
-def run_extraction(platform):
-    class_name = platform + 'Connector'
-    try:
-        connector = getattr(sys.modules[__name__], class_name)()
-    except AttributeError:
-        'The connector you have tried to access does not exist.'
-    auth = get_auth(platform)
+def run_extraction(connector, authenticator):
+    auth = authenticator.refresh_tokens()[1]
     start_date = input('Please enter the start date in the format YYYY-MM-DD')
     end_date = input('Please enter the end date in the format YYYY-MM-DD')
     print('Please provide a text file containing the IDs of the campaigns you would like to analyse.'
@@ -118,15 +115,6 @@ def run_extraction(platform):
     # User should specify file containing campaign IDs (should be English only)
 
 
-def get_auth(platform):
-    class_name = platform + 'TokenRefresher'
-    try:
-        token_extractor = getattr(sys.modules[__name__], class_name)()
-    except AttributeError:
-        'The connector you have tried to access does not exist.'
-    return token_extractor.refresh_tokens()[1]
-
-
 def run_preprocessing(data):
     print('Extracting features from ad headline....')
     try:
@@ -135,8 +123,8 @@ def run_preprocessing(data):
         print('Please make sure your file contains the following columns: '
               'columns ad_id, headline_text, url, cpc, ctr, cvr')
     data = data.join(ad_extractor.run_all())
-    compound_calc = CompoundFeatureCalculator(data)
-    data = data.join(compound_calc.calc_compound('cpc', 'ctr'))
+    # compound_calc = CompoundFeatureCalculator(data)
+    # data = data.join(compound_calc.calc_compound('cpc', 'ctr'))
     print('Extracting features from URL...')
     url_extractor = UrlTransformer(data[['url']])
     data = data.join(url_extractor.extract_domains(), on='ad_id')
@@ -146,8 +134,10 @@ def run_preprocessing(data):
     data = data.join(html_extractor.extract_all())
     print('Extracting text comparison data...')
     text_extractor = TextProcessor(data[['headline_text']].join(html_extractor.extract_text()))
+    token_data = text_extractor.tf_idf()
     data = data.join(text_extractor.cosine_similarity())
-    # data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
+    data = data.join(token_data, rsuffix='_hl')
+    data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
     return data
 
 
