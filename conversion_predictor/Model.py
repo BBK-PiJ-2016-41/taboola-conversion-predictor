@@ -63,14 +63,17 @@ class Visualisation:
         t = f.suptitle('Conversion Rate Attributes Correlation Heatmap', fontsize=14)
         plt.show()
 
-    def pairwise_scatter_plot(self, columns):
+    def pairwise_scatter_plot(self, columns=None):
         """
         Generates a pairwise scatter plot with the attributes in the dataframe.
         Has an option to specify a column subset to use in comparison.
         :param columns:
         :return:
         """
-        columns = list(filter(lambda column: column in self.columns, columns))
+        if columns == None:
+            columns = self.df.columns.values
+        else:
+            columns = list(filter(lambda column: column in self.columns, columns))
         pp = sns.pairplot(self.df[columns], size=1.8, aspect=1.8,
                           plot_kws=dict(edgecolor="k", linewidth=0.5),
                           diag_kind="kde", diag_kws=dict(shade=True))

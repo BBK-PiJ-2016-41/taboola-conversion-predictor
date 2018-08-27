@@ -25,28 +25,28 @@ class DataExploration(cmd.Cmd):
         print('Display histograms for all fo the columns in the dataframe.\nYou can optionally specify a ' +
               'single column name in order to show a histogram of that single column.')
 
-    def do_pairwise_correlation(self):
+    def do_pairwisecorrelation(self, col=None):
         self.viz.pairwise_correlation_matrix()
 
-    def help_pairwise_correlation(self):
+    def help_pairwisecorrelation(self):
         print('Display the pairwise correlation matrix for all columns in the dataframe.')
 
-    def do_scatter_plot(self, columns=None):
+    def do_scatterplot(self, columns=None):
         if len(columns) > 0:
             columns = columns.split(',')
             self.viz.pairwise_scatter_plot(columns)
         else:
             self.viz.pairwise_scatter_plot()
 
-    def help_scatter_plot(self):
+    def help_scatterplot(self):
         print('Display a pairwise scatter plot for all of the columns in the dataframe.\nOptionally ' +
               'specify a subset of columns, separated by a comma (,).')
 
-    def do_select_scatter_plot(self, cols):
+    def do_selectscatterplot(self, cols):
         cols = cols.split(',')
         self.viz.selected_plot(cols[0], cols[1])
 
-    def help_select_scatter_plot(self):
+    def help_selectscatterplot(self):
         print('Display a single scatter plot for two specified columns, separated by a comma (,).')
 
     def do_EOF(self, line):

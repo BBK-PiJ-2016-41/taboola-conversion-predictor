@@ -332,9 +332,16 @@ class TextProcessor:
         headline_df = self.lemmatize().copy()
         headline_df = headline_df.reset_index()
         headline_array = self.calculate_tf_idf(headline_df['lemmatized_headline'])
-        text_array = self.calculate_tf_idf(headline_df['lemmatized_text'])
+        # text_array = self.calculate_tf_idf(headline_df['lemmatized_text'])
         combined = headline_df.join(headline_array)
-        return combined.join(text_array, lsuffix='_headline', rsuffix='_text')
+        combined.set_index('ad_id', inplace=True)
+        combined = combined.drop('lemmatized_headline', axis=1)
+        combined = combined.drop('lemmatized_text', axis=1)
+        combined = combined.drop('stop_word_headline', axis=1)
+        combined = combined.drop('stop_word_text', axis=1)
+        combined = combined.drop('text', axis=1)
+        combined = combined.drop('headline_text', axis=1)
+        return combined  # .join(text_array, lsuffix='_headline', rsuffix='_text')
 
     def calculate_tf_idf(self, data_frame_column):
         """
