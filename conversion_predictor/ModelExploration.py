@@ -24,8 +24,30 @@ class ModelExploration(cmd.Cmd):
     def do_score(self, arg=None):
         self.model.score()
 
+    def do_printscore(self, arg=None):
+        self.model.print_score()
+
     def help_score(self):
         print('Outputs the score of the model.')
+
+    def do_crossvalidation(self, folds=5):
+        self.model.cross_validation_score(folds)
+
+    def do_printcrossvalidation(self, folds=5):
+        self.model.print_cross_val(folds)
+
+    def help_crossvalidation(self):
+        print('Outputs the cross-validated score of the model.'
+              '\nYou have the option of specifying the number of folds (default 5).')
+
+    def do_rootmeansquarederror(self, arg=None):
+        self.model.root_mean_squared_error()
+
+    def do_printrootmeansquared(self, arg=None):
+        self.model.print_rsme()
+
+    def help_rootmeansquarederror(self):
+        print('Outputs the root mean squared error of the model.')
 
     def do_alpha(self, alpha, arg=None):
         if self.model.__class__.__name__ != 'LinearRegressionModel':
