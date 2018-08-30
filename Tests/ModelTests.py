@@ -1,8 +1,9 @@
 from conversion_predictor.Model import BasicModel
-from conversion_predictor.Model import Visualisation
+from conversion_predictor.Visualisation import Visualisation
 from conversion_predictor.Model import LinearRegressionModel
 import pandas as pd
 from unittest import TestCase
+
 
 
 class VisualisationTests(TestCase):
@@ -15,9 +16,6 @@ class VisualisationTests(TestCase):
         target = target.drop('headline', 1)
         target = target.apply(pd.to_numeric)
         self.model = Visualisation(target)
-
-    def test_data_head(self):
-        self.model.head()
 
     def test_data_describe(self):
         self.model.describe()

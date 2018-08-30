@@ -7,7 +7,8 @@ from conversion_predictor.CompoundFeatureCalculator import CompoundFeatureCalcul
 from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTransformer, TextProcessor
 from conversion_predictor.DataExploration import DataExploration
 from conversion_predictor.ModelExploration import ModelExploration
-from conversion_predictor.Model import Visualisation, LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
+from conversion_predictor.Visualisation import Visualisation
+from conversion_predictor.Model import LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
 from conversion_predictor.Factory import ConnectorFactory, TokenRefresherFactory
 
 

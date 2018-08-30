@@ -15,7 +15,7 @@ class DataExploration(cmd.Cmd):
             self.viz.describe()
 
     def help_describe(self):
-        print('Print a description of the dataframe.\nou can optionally specify column names in order ' +
+        print('Print a description of the dataframe.\nYou can optionally specify column names in order ' +
               'to describe a subset of the dataframe.\nPlease use a comma (,) as a separator.')
 
     def do_histograms(self, col=None):

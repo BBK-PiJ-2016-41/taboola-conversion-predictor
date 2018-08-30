@@ -1,6 +1,6 @@
 from unittest import TestCase
 import pandas as pd
-from conversion_predictor.Model import Visualisation
+from conversion_predictor.Visualisation import Visualisation
 from conversion_predictor.DataExploration import DataExploration
 
 
