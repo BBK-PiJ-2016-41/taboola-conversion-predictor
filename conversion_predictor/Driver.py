@@ -161,7 +161,7 @@ def switcher(input):
         'T': 'Taboola',
         'F': 'File'
     }
-    return dictionary.get('T', 'File')
+    return dictionary.get(input, 'File')
 
 
 def output_results():
