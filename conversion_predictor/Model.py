@@ -43,12 +43,11 @@ class BasicModel(ABC):
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=split_size)
         return x, y, x_train, x_test, y_train, y_test
 
-    def cross_validation_score(self, folds):
+    def cross_validation_score(self, folds=5):
         results = cross_val_score(self.lm, self.X, self.y, cv=folds)
-        print(results)
-        return np.mean(results)
+        return round(np.mean(results), 6)
 
-    def print_cross_val(self, folds):
+    def print_cross_val(self, folds=5):
         print(self.cross_validation_score(folds))
 
     def fit_model(self):
@@ -58,13 +57,13 @@ class BasicModel(ABC):
         return self.lm.predict(self.X_test)
 
     def score(self):
-        return self.lm.score(self.X_test, self.y_test)
+        return round(self.lm.score(self.X_test, self.y_test), 6)
 
     def print_score(self):
         print(self.score())
 
     def root_mean_squared_error(self):
-        return np.sqrt(mean_squared_error(self.y_test, self.prediction))
+        return round(np.sqrt(mean_squared_error(self.y_test, self.prediction)), 6)
 
     def print_rmse(self):
         print(self.root_mean_squared_error())

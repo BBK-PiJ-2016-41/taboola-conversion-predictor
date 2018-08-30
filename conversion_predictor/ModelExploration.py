@@ -30,21 +30,21 @@ class ModelExploration(cmd.Cmd):
     def help_score(self):
         print('Outputs the score of the model.')
 
-    def do_crossvalidation(self, folds=5):
-        self.model.cross_validation_score(folds)
+    def do_crossvalidation(self, folds):
+        self.model.cross_validation_score(int(folds))
 
-    def do_printcrossvalidation(self, folds=5):
-        self.model.print_cross_val(folds)
+    def do_printcrossvalidation(self, folds):
+        self.model.print_cross_val(int(folds))
 
     def help_crossvalidation(self):
         print('Outputs the cross-validated score of the model.'
-              '\nYou have the option of specifying the number of folds (default 5).')
+              '\nPlease specify the number of folds.')
 
     def do_rootmeansquarederror(self, arg=None):
         self.model.root_mean_squared_error()
 
     def do_printrootmeansquared(self, arg=None):
-        self.model.print_rsme()
+        self.model.print_rmse()
 
     def help_rootmeansquarederror(self):
         print('Outputs the root mean squared error of the model.')

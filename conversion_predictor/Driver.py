@@ -55,6 +55,8 @@ def main():
         command_interpreter = DataExploration(viz)
         command_interpreter.cmdloop()
 
+        cleaned_data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
+
         # Once EDA is performed, suggest options for model
         print('You now have several options for regression analysis. The train/test split is set to 0.3')
         regression_type = 1

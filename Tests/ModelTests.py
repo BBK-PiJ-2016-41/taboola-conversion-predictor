@@ -1,6 +1,7 @@
 from conversion_predictor.Model import BasicModel
 from conversion_predictor.Visualisation import Visualisation
 from conversion_predictor.Model import LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
+from conversion_predictor.ModelExploration import ModelExploration
 import pandas as pd
 from unittest import TestCase
 
@@ -63,6 +64,10 @@ class LinearModelTests(TestCase):
     def test_cross_val(self):
         score = self.linear_model.cross_validation_score(5)
         self.linear_model.print_cross_val(5)
+
+    def test_model_exploration_tests(self):
+        model_explorer = ModelExploration(self.linear_model)
+        model_explorer.cmdloop()
 
 
 class LassoModelTests(TestCase):
