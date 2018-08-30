@@ -46,11 +46,12 @@ def main():
         print('This is a sample of the data we will be analysing:')
         print(data.head())
 
-        processed_data = run_preprocessing(data)
+        processed_data, text_processed_data = run_preprocessing(data)
+        cleaned_data = clean_columns_formats(text_processed_data)
         # Once dataframe is complete, suggest options for EDA
-
-        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.')
-        viz = Visualisation(processed_data)
+        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.'
+              '\nThis will not include the tokenised data for ease of visualisation.')
+        viz = Visualisation(clean_columns_formats(processed_data))
         command_interpreter = DataExploration(viz)
         command_interpreter.cmdloop()
 
@@ -60,11 +61,11 @@ def main():
         while regression_type == 1:
             regression_type = input('Please enter Linear, Ridge or Lasso, or 0 to exit the regression phase: ')
             if regression_type == 'Lasso':
-                model = LassoRegressionModel(processed_data, 'cvr')
+                model = LassoRegressionModel(cleaned_data, 'cvr')
             elif regression_type == 'Ridge':
-                model = RidgeRegressionModel(processed_data, 'cvr')
+                model = RidgeRegressionModel(cleaned_data, 'cvr')
             elif regression_type == 'Linear':
-                model = LinearRegressionModel(processed_data, 'cvr')
+                model = LinearRegressionModel(cleaned_data, 'cvr')
             else:
                 continue
             model_explorer = ModelExploration(model)
@@ -137,17 +138,22 @@ def run_preprocessing(data):
     print('Extracting features from HTML...')
     html_extractor = HtmlTransformer(html_data)
     data = data.join(html_extractor.extract_all())
+
     print('Extracting text comparison data...')
     text_extractor = TextProcessor(data[['headline_text']].join(html_extractor.extract_text()))
     token_data = text_extractor.tf_idf()
     data = data.join(text_extractor.cosine_similarity())
-    data = data.join(token_data, rsuffix='_hl')
-    processed_data = data.drop('headline_text', axis=1)
-    processed_data = processed_data.drop('url', axis=1)
-    processed_data = processed_data.drop('domain', axis=1)
-    processed_data = processed_data.apply(pd.to_numeric)
-    processed_data = processed_data.fillna(processed_data.mean())
-    return processed_data
+    text_data = data.join(token_data, rsuffix='_hl')
+    return data, text_data
+
+
+def clean_columns_formats(data):
+    data = data.drop('headline_text', axis=1)
+    data = data.drop('url', axis=1)
+    data = data.drop('domain', axis=1)
+    data = data.apply(pd.to_numeric)
+    data = data.fillna(data.mean())
+    return data
 
 
 def switcher(input):
