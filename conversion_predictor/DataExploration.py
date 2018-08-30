@@ -7,6 +7,12 @@ class DataExploration(cmd.Cmd):
         super(DataExploration, self).__init__()
         self.viz = data_visualiser
 
+    def do_printcolumns(self, col=None):
+        print(self.viz.columns)
+
+    def help_printcolumns(self):
+        print('Print out the column names in the dataframe.')
+
     def do_describe(self, attributes=None):
         if len(attributes) > 0:
             attributes_array = attributes.split(',')

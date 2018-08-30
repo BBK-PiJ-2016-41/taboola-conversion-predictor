@@ -7,11 +7,14 @@ from conversion_predictor.DataExploration import DataExploration
 class UrlTester(TestCase):
 
     def setUp(self):
-        data = pd.read_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
+        data = pd.read_json("C:\\Users\\Kathryn\\Documents\\Birkbeck\\MSc Project\\DataOutput9.json")
         data.set_index('ad_id', inplace=True)
-        data.drop('headline_text', axis=1)
-        data.drop('url', axis=1)
-        data.drop('domain', axis=1)
+        data = data.drop('headline', axis=1)
+        data = data.drop('page_text', axis=1)
+        data = data.drop('url', axis=1)
+        #data.drop('domain', axis=1)
+        data = data.apply(pd.to_numeric)
+        data = data.fillna(data.mean())
         visualiser = Visualisation(data)
         self.data_explorer = DataExploration(visualiser)
 
