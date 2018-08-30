@@ -59,3 +59,9 @@ class LinearModelTests(TestCase):
     def test_rmse(self):
         rmse = self.linear_model.root_mean_squared_error()
         self.assertLess(0, rmse)
+
+    def test_cross_val(self):
+        score = self.linear_model.cross_validation_score(5)
+        self.assertGreater(1, score)
+        self.assertLess(0, score)
+        self.linear_model.print_cross_val(5)

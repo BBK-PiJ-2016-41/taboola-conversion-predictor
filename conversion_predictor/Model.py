@@ -2,6 +2,7 @@ from abc import ABC
 import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
@@ -42,8 +43,12 @@ class BasicModel(ABC):
         x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=split_size)
         return x, y, x_train, x_test, y_train, y_test
 
-    def cross_validation(self, folds):
-        TODO
+    def cross_validation_score(self, folds):
+        results = cross_val_score(self.lm, self.X, self.y, folds)
+        return np.mean(results)
+
+    def print_cross_val(self, folds):
+        print(self.cross_validation_score(folds))
 
     def fit_model(self):
         self.lm.fit(self.X_train, self.y_train)
