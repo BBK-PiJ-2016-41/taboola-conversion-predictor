@@ -38,12 +38,21 @@ class VisualisationTests(TestCase):
     def test_selected_scatterplot(self):
         self.model.selected_scatter_plot('words_para', 'words_sentence')
 
-    # def test_subclass(self):
-        # target = pd.read_json("C:\\Users\\Kathryn\\Documents\\Birkbeck\\MSc Project\\DataOutput9.json")
-        # target.set_index('ad_id', inplace=True)
-        # target = target.drop('url', 1)
-        # target = target.drop('page_text', 1)
-        # target = target.drop('headline', 1)
-        # target = target.apply(pd.to_numeric)
-        # model = LinearRegressionModel(target, 'cvr')
-        # model.selected_scatter_plot('words_para', 'words_sentence')
+
+class LinearModelTests(TestCase):
+
+    def setUp(self):
+        target = pd.read_json("C:\\Users\\Kathryn\\Documents\\Birkbeck\\MSc Project\\DataOutput9.json")
+        target.set_index('ad_id', inplace=True)
+        target = target.drop('url', 1)
+        target = target.drop('page_text', 1)
+        target = target.drop('headline', 1)
+        target = target.apply(pd.to_numeric)
+        self.linear_model = LinearRegressionModel(target, 'cvr')
+
+    def test_score(self):
+        score = self.linear_model.score()
+        self.assertGreater(1, score)
+        self.assertLess(0, score)
+        self.linear_model.print_score()
+

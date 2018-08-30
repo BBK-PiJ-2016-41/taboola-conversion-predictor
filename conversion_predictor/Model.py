@@ -10,7 +10,6 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
 
 
-
 class BasicModel(ABC):
 
     def __init__(self, data_frame, target_variable_col, split_size=0.3):
@@ -39,7 +38,7 @@ class BasicModel(ABC):
         """
         x = self.df.drop([self.target], 1).values
         y = self.df[self.target].values
-        x_train, x_test, y_train, y_test = train_test_split(x, y, split_size)
+        x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=split_size)
         return x, y, x_train, x_test, y_train, y_test
 
     def cross_validation(self, folds):
@@ -69,23 +68,34 @@ class BasicModel(ABC):
         """
         pass
 
+    @abstractmethod
+    def rmse(self):
+        pass
+
+
 
 class LinearRegressionModel(BasicModel):
 
     def __init__(self, data_frame, target_variable_col, split_size=0.3):
         super().__init__(data_frame, target_variable_col, split_size)
         self.lm = LinearRegression()
+        self.fit_model()
+        self.prediction = self.predict()
 
     def fit_model(self):
         self.lm.fit(self.X_train, self.y_train)
 
     def predict(self):
-        self.lm.predict(self.X_test)
+        return self.lm.predict(self.X_test)
 
     def score(self):
-        score = self.lm.score(self.X_test, self.y_test)
-        print(score)
-        return self.score
+        return self.lm.score(self.X_test, self.y_test)
+
+    def print_score(self):
+        print(self.score())
+
+    def rmse(self):
+        pass
 
 
 class LassoRegressionModel(BasicModel):
@@ -107,6 +117,9 @@ class LassoRegressionModel(BasicModel):
         score = self.lm.score(self.X_test, self.y_test)
         print(score)
         return score
+
+    def rmse(self):
+        pass
 
     def reset_alpha(self, alpha):
         """
@@ -135,6 +148,9 @@ class RidgeRegressionModel(BasicModel):
         score = self.rm.score(self.X_test, self.y_test)
         print(score)
         return score
+
+    def rmse(self):
+        pass
 
     def reset_alpha(self, alpha):
         """
