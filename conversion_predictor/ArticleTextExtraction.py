@@ -247,12 +247,19 @@ class HtmlTransformer:
         Runs all of the above functions
         :return: a data frame with ad id and all of the above data points
         """
+        print('...total words')
         self.extract_total_words()
+        print('...number of sentences')
         self.extract_num_sentences()
+        print('...number of paragraphs')
         self.extract_num_paras()
+        print('...words per sentence')
         self.extract_words_sentence()
+        print('...words per paragraph')
         self.extract_words_para()
+        print('...syllables per word')
         self.extract_syllables_word()
+        print('...number of clickouts')
         self.extract_clickouts()
         return self.df[['num_clickouts', 'words_sentence', 'words_para', 'syllables_word',
                         'num_paras', 'num_words', 'num_sentences']]

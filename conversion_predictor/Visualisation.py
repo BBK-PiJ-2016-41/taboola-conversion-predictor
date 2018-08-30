@@ -8,7 +8,7 @@ class Visualisation:
     # credit: https://towardsdatascience.com/the-art-of-effective-visualization-of-multi-dimensional-data-6c7202990c57
     def __init__(self, data_frame):
         """
-        Constructor for the Visualisation class. May be useful for EDA.
+        Constructor for the Visualisation class.
         :param data_frame: the dataframe containing the data to be visualised.
         Use built-in head() method in dataframe to print first few lines.
         """
@@ -66,7 +66,7 @@ class Visualisation:
             columns = self.df.columns.values
         else:
             columns = list(filter(lambda column: column in self.columns, columns))
-        pp = sns.pairplot(self.df[columns], size=1.8, aspect=1.8,
+        pp = sns.pairplot(self.df[columns], height=2, aspect=2,
                           plot_kws=dict(edgecolor="k", linewidth=0.5),
                           diag_kind="kde", diag_kws=dict(shade=True))
 
