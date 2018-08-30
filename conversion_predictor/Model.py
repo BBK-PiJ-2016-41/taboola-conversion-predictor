@@ -5,6 +5,7 @@ import matplotlib as mpl
 import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
@@ -69,7 +70,7 @@ class BasicModel(ABC):
         pass
 
     @abstractmethod
-    def rmse(self):
+    def root_mean_squared_error(self):
         pass
 
 
@@ -94,9 +95,11 @@ class LinearRegressionModel(BasicModel):
     def print_score(self):
         print(self.score())
 
-    def rmse(self):
-        pass
+    def root_mean_squared_error(self):
+        return np.sqrt(mean_squared_error(self.y_test, self.prediction))
 
+    def print_rmse(self):
+        print(self.root_mean_squared_error())
 
 class LassoRegressionModel(BasicModel):
 
@@ -118,7 +121,7 @@ class LassoRegressionModel(BasicModel):
         print(score)
         return score
 
-    def rmse(self):
+    def root_mean_squared_error(self):
         pass
 
     def reset_alpha(self, alpha):
@@ -149,7 +152,7 @@ class RidgeRegressionModel(BasicModel):
         print(score)
         return score
 
-    def rmse(self):
+    def root_mean_squared_error(self):
         pass
 
     def reset_alpha(self, alpha):

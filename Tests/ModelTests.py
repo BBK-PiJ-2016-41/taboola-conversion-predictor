@@ -56,3 +56,6 @@ class LinearModelTests(TestCase):
         self.assertLess(0, score)
         self.linear_model.print_score()
 
+    def test_rmse(self):
+        rmse = self.linear_model.root_mean_squared_error()
+        self.assertLess(0, rmse)
