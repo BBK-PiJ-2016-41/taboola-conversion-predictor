@@ -44,7 +44,8 @@ class BasicModel(ABC):
         return x, y, x_train, x_test, y_train, y_test
 
     def cross_validation_score(self, folds):
-        results = cross_val_score(self.lm, self.X, self.y, folds)
+        results = cross_val_score(self.lm, self.X, self.y, cv=folds)
+        print(results)
         return np.mean(results)
 
     def print_cross_val(self, folds):
@@ -80,8 +81,10 @@ class LinearRegressionModel(BasicModel):
 class LassoRegressionModel(BasicModel):
 
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
-        super().__init__(data_frame, target_variable_col, Lasso(self.alpha), split_size)
+        super().__init__(data_frame, target_variable_col, Lasso(alpha), split_size)
         self.alpha = alpha
+        self.fit_model()
+        self.prediction = self.predict()
 
     def reset_alpha(self, alpha):
         """
@@ -102,6 +105,8 @@ class RidgeRegressionModel(BasicModel):
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
         super().__init__(data_frame, target_variable_col, Ridge(alpha), split_size)
         self.alpha = alpha
+        self.fit_model()
+        self.prediction = self.predict()
 
     def reset_alpha(self, alpha):
         """
