@@ -47,14 +47,19 @@ class ModelExploration(cmd.Cmd):
 
     def do_lassodisplay(self, arg=None):
         if self.model.__class__.__name__ != 'LassoRegressionModel':
-            print('Only LASSO regression model has a visual display.')
+            print('Only LASSO regression can use this feature.')
         else:
             self.model.display_coef()
 
     def help_lassodisplay(self):
         print('Displays LASSO coefficient graph.')
 
-
+    def do_featuredisplay(self, arg=None):
+        model_type = self.model.__class__.__name__
+        if model_type == 'RandomForestRegressionModel' or model_type == 'GradientBoostingRegressionModel':
+            print(self.model.feature_importance())
+        else:
+            print('Only Random Forest and Gradient Boosting regression can use this feature.')
 
     def do_EOF(self, line):
         return True
