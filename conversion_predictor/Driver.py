@@ -8,7 +8,8 @@ from conversion_predictor.ArticleTextExtraction import UrlTransformer, HtmlTrans
 from conversion_predictor.DataExploration import DataExploration
 from conversion_predictor.ModelExploration import ModelExploration
 from conversion_predictor.Visualisation import Visualisation
-from conversion_predictor.Model import LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel
+from conversion_predictor.Model import LinearRegressionModel, LassoRegressionModel, RidgeRegressionModel, \
+    RandomForestRegressionModel, GradientBoostingRegressionModel
 from conversion_predictor.Factory import ConnectorFactory, TokenRefresherFactory
 
 
@@ -60,14 +61,18 @@ def main():
         # Once EDA is performed, suggest options for model
         print('You now have several options for regression analysis. The train/test split is set to 0.3')
         regression_type = 1
-        while regression_type == 1:
-            regression_type = input('Please enter Linear, Ridge or Lasso, or 0 to exit the regression phase: ')
+        while regression_type != 0:
+            regression_type = input('Please enter Linear, Ridge, Lasso, Random Forest or Gradient Boosting, or 0 to exit the regression phase: ')
             if regression_type == 'Lasso':
                 model = LassoRegressionModel(clean_columns_formats(processed_data), 'cvr')
             elif regression_type == 'Ridge':
                 model = RidgeRegressionModel(cleaned_data, 'cvr')
             elif regression_type == 'Linear':
                 model = LinearRegressionModel(cleaned_data, 'cvr')
+            elif regression_type == 'Random Forest':
+                model = RandomForestRegressionModel(cleaned_data, 'cvr')
+            elif regression_type == 'Gradient Boosting':
+                model = GradientBoostingRegressionModel(cleaned_data, 'cvr')
             else:
                 continue
             model_explorer = ModelExploration(model)
