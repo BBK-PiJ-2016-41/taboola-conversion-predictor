@@ -182,3 +182,6 @@ class GradientBoostingTests(TestCase):
     def test_cross_val(self):
         score = self.linear_model.cross_validation_score(5)
         self.linear_model.print_cross_val(5)
+
+    def test_feature_importances(self):
+        print(self.linear_model.feature_importance())

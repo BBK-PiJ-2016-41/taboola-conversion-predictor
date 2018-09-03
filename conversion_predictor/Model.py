@@ -161,6 +161,7 @@ class GradientBoostingRegressionModel(BasicModel):
     def feature_importance(self):
         index = np.argwhere(self.columns == 'cvr')
         columns = np.delete(self.columns, index)
-        return pd.DataFrame(self.lm.feature_importances_,
+        dataframe = pd.DataFrame(self.lm.feature_importances_,
                             index=columns,
                             columns=['importance']).sort_values('importance', ascending=False)
+        return dataframe.round(6)
