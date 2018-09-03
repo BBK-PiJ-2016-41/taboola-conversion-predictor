@@ -17,10 +17,16 @@ class ModelExploration(cmd.Cmd):
         print('Outputs the score of the model.')
 
     def do_crossvalidation(self, folds):
-        self.model.cross_validation_score(int(folds))
+        try:
+            self.model.cross_validation_score(int(folds))
+        except ValueError:
+            print('Please include the number of folds.')
 
     def do_printcrossvalidation(self, folds):
-        self.model.print_cross_val(int(folds))
+        try:
+            self.model.print_cross_val(int(folds))
+        except ValueError:
+            print('Please include the number of folds.')
 
     def help_crossvalidation(self):
         print('Outputs the cross-validated score of the model.'
@@ -60,6 +66,9 @@ class ModelExploration(cmd.Cmd):
             print(self.model.feature_importance())
         else:
             print('Only Random Forest and Gradient Boosting regression can use this feature.')
+
+    def help_featuredisplay(self):
+        print('Displays feature importance for Random Forest and Gradient Boosting.')
 
     def do_EOF(self, line):
         return True

@@ -61,7 +61,7 @@ def main():
         # Once EDA is performed, suggest options for model
         print('You now have several options for regression analysis. The train/test split is set to 0.3')
         regression_type = 1
-        while regression_type != 0:
+        while regression_type != '0':
             regression_type = input('Please enter Linear, Ridge, Lasso, Random Forest or Gradient Boosting, or 0 to exit the regression phase: ')
             if regression_type == 'Lasso':
                 model = LassoRegressionModel(clean_columns_formats(processed_data), 'cvr')
@@ -74,9 +74,11 @@ def main():
             elif regression_type == 'Gradient Boosting':
                 model = GradientBoostingRegressionModel(cleaned_data, 'cvr')
             else:
-                continue
-            model_explorer = ModelExploration(model)
-            model_explorer.cmdloop()
+                print('Please enter Linear, Ridge, Lasso, Random Forest, Gradient Boosting, or 0 to exit.')
+
+            if regression_type != '0':
+                model_explorer = ModelExploration(model)
+                model_explorer.cmdloop()
 
         output_file = input('Please specify the file you would like to output your data to.')
         processed_data.to_csv(output_file)
