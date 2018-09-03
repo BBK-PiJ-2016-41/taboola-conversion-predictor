@@ -1,12 +1,15 @@
 from abc import ABC
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import Lasso
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 
 
 class BasicModel(ABC):
@@ -80,7 +83,7 @@ class LinearRegressionModel(BasicModel):
 class LassoRegressionModel(BasicModel):
 
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
-        super().__init__(data_frame, target_variable_col, Lasso(alpha), split_size)
+        super().__init__(data_frame, target_variable_col, Lasso(alpha, normalize=False), split_size)
         self.alpha = alpha
         self.fit_model()
         self.prediction = self.predict()
@@ -91,18 +94,29 @@ class LassoRegressionModel(BasicModel):
         :param alpha: The alpha parameter value.
         :return:
         """
-        self.alpha = alpha
-        self.lm = Lasso(self.alpha)
+        self.alpha = float(alpha)
+        self.lm = Lasso(self.alpha, normalize=False)
+        self.fit_model()
+        self.prediction = self.predict()
 
     def coef(self):
         coef = self.lm.fit(self.X, self.y).coef_
         return coef
 
+    def display_coef(self):
+        coef = np.array(self.coef())
+        index = np.argwhere(self.columns == 'cvr')
+        columns = np.delete(self.columns, index)
+        plt.plot(range(len(columns)), coef)
+        plt.xticks(range(len(columns)), columns, rotation=90)
+        plt.ylabel('Coefficients')
+        plt.show()
+
 
 class RidgeRegressionModel(BasicModel):
 
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
-        super().__init__(data_frame, target_variable_col, Ridge(alpha), split_size)
+        super().__init__(data_frame, target_variable_col, Ridge(alpha, normalize=True), split_size)
         self.alpha = alpha
         self.fit_model()
         self.prediction = self.predict()
@@ -113,5 +127,23 @@ class RidgeRegressionModel(BasicModel):
         :param alpha: The alpha parameter value.
         :return:
         """
-        self.alpha = alpha
-        self.lm = Ridge(self.alpha)
+        self.alpha = float(alpha)
+        self.lm = Ridge(self.alpha, normalize=True)
+        self.fit_model()
+        self.prediction = self.predict()
+
+
+class RandomForestRegressionModel(BasicModel):
+
+    def __init__(self, data_frame, target_variable_col, split_size=0.3):
+        super().__init__(data_frame, target_variable_col, RandomForestRegressor(n_estimators=10, criterion='mse'), split_size)
+        self.fit_model()
+        self.prediction = self.predict()
+
+
+class GradientBoostingRegressionModel(BasicModel):
+
+    def __init__(self, data_frame, target_variable_col, split_size=0.3):
+        super().__init__(data_frame, target_variable_col, GradientBoostingRegressor(n_estimators=10, criterion='mse'))
+        self.fit_model()
+        self.prediction = self.predict()
