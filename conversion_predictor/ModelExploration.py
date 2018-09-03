@@ -7,20 +7,6 @@ class ModelExploration(cmd.Cmd):
         super(ModelExploration, self).__init__()
         self.model = regression_model
 
-    def do_fit(self, arg=None):
-        self.model.fit_model()
-
-    def help_fit(self):
-        print('Run this to fit the model.')
-        if self.model.__class__.__name__ == 'LassoRegressionModel':
-            print('This function will also print the coefficients.')
-
-    def do_predict(self, arg=None):
-        self.model.predict()
-
-    def help_predict(self):
-        print('Run this to train the model on the training data set.')
-
     def do_score(self, arg=None):
         self.model.score()
 
@@ -58,6 +44,15 @@ class ModelExploration(cmd.Cmd):
     def help_alpha(self):
         print('Enter a new alpha parameter to tune Lasso and Ridge regression models.'
               '\nThis method is not available for Linear models.')
+
+    def do_lassodisplay(self, arg=None):
+        if self.model.__class__.__name__ != 'LassoRegressionModel':
+            print('Only LASSO regression model has a visual display.')
+        else:
+            self.model.display_coef()
+
+    def help_lassodisplay(self):
+        print('Displays LASSO coefficient graph.')
 
     def do_EOF(self, line):
         return True

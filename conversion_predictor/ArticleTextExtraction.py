@@ -312,8 +312,10 @@ class TextProcessor:
         :return the dataframe containing the text fields with stop words removed
         """
         df_copy = self.df.copy()
-        df_copy['stop_word_headline'] = df_copy['headline_text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
-        df_copy['stop_word_text'] = df_copy['text'].apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy['stop_word_headline'] = df_copy['headline_text']\
+            .apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
+        df_copy['stop_word_text'] = df_copy['text']\
+            .apply(lambda row: self.stop_word_remover(re.sub(r'[.\+\-!?\[\]\';\|():",*]', '', row)))
         return df_copy
 
     def stop_word_remover(self, text):
@@ -348,7 +350,7 @@ class TextProcessor:
         combined = combined.drop('stop_word_text', axis=1)
         combined = combined.drop('text', axis=1)
         combined = combined.drop('headline_text', axis=1)
-        return combined  # .join(text_array, lsuffix='_headline', rsuffix='_text')
+        return combined # .join(text_array, lsuffix='_headline', rsuffix='_text')
 
     def calculate_tf_idf(self, data_frame_column):
         """

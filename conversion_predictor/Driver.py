@@ -63,7 +63,7 @@ def main():
         while regression_type == 1:
             regression_type = input('Please enter Linear, Ridge or Lasso, or 0 to exit the regression phase: ')
             if regression_type == 'Lasso':
-                model = LassoRegressionModel(cleaned_data, 'cvr')
+                model = LassoRegressionModel(clean_columns_formats(processed_data), 'cvr')
             elif regression_type == 'Ridge':
                 model = RidgeRegressionModel(cleaned_data, 'cvr')
             elif regression_type == 'Linear':

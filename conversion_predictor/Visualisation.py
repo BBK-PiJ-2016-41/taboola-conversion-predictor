@@ -35,10 +35,12 @@ class Visualisation:
         """
         if col == 'None' or col not in self.columns:
             # play with these dimensions a bit more
-            self.df.hist(bins=10, color='steelblue', edgecolor='black', linewidth=1.0, xlabelsize=8, ylabelsize=8, grid=False)
+            self.df.hist(bins=10, color='steelblue', edgecolor='black',
+                         linewidth=1.0, xlabelsize=8, ylabelsize=8, grid=False)
         else:
             # play with these dimensions a bit more
-            self.df[col].hist(bins=10, color='steelblue', edgecolor='black', linewidth=1.0, xlabelsize=8, ylabelsize=8, grid=False)
+            self.df[col].hist(bins=10, color='steelblue', edgecolor='black',
+                              linewidth=1.0, xlabelsize=8, ylabelsize=8, grid=False)
         plt.tight_layout(rect=(0, 0, 1.5, 1.5))
         plt.show()
 

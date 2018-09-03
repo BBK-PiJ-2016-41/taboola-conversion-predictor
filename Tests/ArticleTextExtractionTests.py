@@ -89,7 +89,9 @@ class HtmlTester(TestCase):
 class TextExtractionTester(TestCase):
 
     def setUp(self):
-        url_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text': ["How Much Does Private Healthcare Actually Cost?"], 'url': ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
+        url_to_test = pd.DataFrame({'ad_id': ['1'], 'headline_text':
+            ["How Much Does Private Healthcare Actually Cost?"], 'url':
+            ["http://insurance.expertsinmoney.com/private-medical-insurance-sweeping-uk"]})
         url_to_test = url_to_test.set_index('ad_id')
         transformer = UrlTransformer(url_to_test)
         html_result = transformer.extract_html()
