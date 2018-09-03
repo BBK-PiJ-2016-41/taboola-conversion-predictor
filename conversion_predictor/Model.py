@@ -140,6 +140,13 @@ class RandomForestRegressionModel(BasicModel):
         self.fit_model()
         self.prediction = self.predict()
 
+    def feature_importance(self):
+        index = np.argwhere(self.columns == 'cvr')
+        columns = np.delete(self.columns, index)
+        return pd.DataFrame(self.lm.feature_importances_,
+                            index=columns,
+                            columns=['importance']).sort_values('importance', ascending=False)
+
 
 class GradientBoostingRegressionModel(BasicModel):
 
@@ -147,3 +154,13 @@ class GradientBoostingRegressionModel(BasicModel):
         super().__init__(data_frame, target_variable_col, GradientBoostingRegressor(n_estimators=10, criterion='mse'))
         self.fit_model()
         self.prediction = self.predict()
+
+    def feature_importances(self):
+        return self.lm.feature_importances_
+
+    def feature_importance(self):
+        index = np.argwhere(self.columns == 'cvr')
+        columns = np.delete(self.columns, index)
+        return pd.DataFrame(self.lm.feature_importances_,
+                            index=columns,
+                            columns=['importance']).sort_values('importance', ascending=False)
