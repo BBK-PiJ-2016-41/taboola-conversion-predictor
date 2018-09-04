@@ -41,6 +41,9 @@ class Factory(ABC):
 
 
 class ConnectorFactory(Factory):
+    """
+    Class representing a factory of type Connector.
+    """
 
     def __init__(self):
         super().__init__('Connnector')
@@ -53,6 +56,9 @@ class ConnectorFactory(Factory):
 
 
 class TokenRefresherFactory(Factory):
+    """
+    Class representing a factory of type TokenRefresher.
+    """
 
     def __init__(self):
         super().__init__('TokenRefresher')

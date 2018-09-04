@@ -2,14 +2,10 @@ from abc import ABC
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import mean_squared_error
-from sklearn.linear_model import LinearRegression
-from sklearn.linear_model import Ridge
-from sklearn.linear_model import Lasso
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.linear_model import LinearRegression, Ridge, Lasso
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
 
 class BasicModel(ABC):
@@ -47,33 +43,65 @@ class BasicModel(ABC):
         return x, y, x_train, x_test, y_train, y_test
 
     def cross_validation_score(self, folds=5):
+        """
+        Runs cross-validation with the given number of folds.
+        :param folds: Number of folds for cross-validation (k).
+        :return: Mean of the results obtained, rounded to 6 dp.
+        """
         results = cross_val_score(self.lm, self.X, self.y, cv=folds)
         return round(np.mean(results), 6)
 
     def print_cross_val(self, folds=5):
+        """
+        Prints the cross-validation output.
+        :param folds: Number of folds for cross-validation (k).
+        """
         print(self.cross_validation_score(folds))
 
     def fit_model(self):
+        """
+        Calls the method fit on the model instantiated by that particular class.
+        """
         self.lm.fit(self.X_train, self.y_train)
 
     def predict(self):
+        """
+        Calls the predict method on the model instantiated by that particular class.
+        :return: the prediction outcome.
+        """
         return self.lm.predict(self.X_test)
 
     def score(self):
+        """
+        Calls the score method on the model instantiated by that particular class.
+        :return: the score output, rounded to 6 dp.
+        """
         return round(self.lm.score(self.X_test, self.y_test), 6)
 
     def print_score(self):
+        """
+        Prints the outcome of the score method.
+        """
         print(self.score())
 
     def root_mean_squared_error(self):
+        """
+        Calls the root mean squared error method on the model instantiated by that particular class.
+        :return: RMSE rounded to 6 dp.
+        """
         return round(np.sqrt(mean_squared_error(self.y_test, self.prediction)), 6)
 
     def print_rmse(self):
+        """
+        Prints the outcome of the root mean squared error method.
+        """
         print(self.root_mean_squared_error())
 
 
 class LinearRegressionModel(BasicModel):
-
+    """
+    Inherits BasicModel class, using the Linear Regression model.
+    """
     def __init__(self, data_frame, target_variable_col, split_size=0.3):
         super().__init__(data_frame, target_variable_col, LinearRegression(), split_size)
         self.fit_model()
@@ -81,7 +109,9 @@ class LinearRegressionModel(BasicModel):
 
 
 class LassoRegressionModel(BasicModel):
-
+    """
+    Inherits BasicModel class, using the Lasso Regression model.
+    """
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
         super().__init__(data_frame, target_variable_col, Lasso(alpha, normalize=False), split_size)
         self.alpha = alpha
@@ -100,10 +130,18 @@ class LassoRegressionModel(BasicModel):
         self.prediction = self.predict()
 
     def coef(self):
+        """
+        Extracts the correlation coefficients from the Lasso regression model.
+        :return: The correlation coefficients as an array.
+        """
         coef = self.lm.fit(self.X, self.y).coef_
         return coef
 
     def display_coef(self):
+        """
+        Displays the correlation coefficients on a line graph.
+        :return:
+        """
         coef = np.array(self.coef())
         index = np.argwhere(self.columns == 'cvr')
         columns = np.delete(self.columns, index)
@@ -114,7 +152,9 @@ class LassoRegressionModel(BasicModel):
 
 
 class RidgeRegressionModel(BasicModel):
-
+    """
+    Inherits BasicModel class, using the Ridge Regression model.
+    """
     def __init__(self, data_frame, target_variable_col, split_size=0.3, alpha=0.1):
         super().__init__(data_frame, target_variable_col, Ridge(alpha, normalize=True), split_size)
         self.alpha = alpha
@@ -134,13 +174,19 @@ class RidgeRegressionModel(BasicModel):
 
 
 class RandomForestRegressionModel(BasicModel):
-
+    """
+    Inherits BasicModel class, using the Random Forest Regression model.
+    """
     def __init__(self, data_frame, target_variable_col, split_size=0.3):
         super().__init__(data_frame, target_variable_col, RandomForestRegressor(n_estimators=10, criterion='mse'), split_size)
         self.fit_model()
         self.prediction = self.predict()
 
     def feature_importance(self):
+        """
+        Generates the feature importance scores from the model.
+        :return: A dataframe containing the feature importance scores.
+        """
         index = np.argwhere(self.columns == 'cvr')
         columns = np.delete(self.columns, index)
         return pd.DataFrame(self.lm.feature_importances_,
@@ -149,16 +195,19 @@ class RandomForestRegressionModel(BasicModel):
 
 
 class GradientBoostingRegressionModel(BasicModel):
-
+    """
+    Inherits BasicModel class, using the Gradient Boosting Regression model.
+    """
     def __init__(self, data_frame, target_variable_col, split_size=0.3):
         super().__init__(data_frame, target_variable_col, GradientBoostingRegressor(n_estimators=10, criterion='mse'))
         self.fit_model()
         self.prediction = self.predict()
 
-    def feature_importances(self):
-        return self.lm.feature_importances_
-
     def feature_importance(self):
+        """
+        Generates the feature importance scores from the model.
+        :return: A dataframe containing the feature importance scores.
+        """
         index = np.argwhere(self.columns == 'cvr')
         columns = np.delete(self.columns, index)
         dataframe = pd.DataFrame(self.lm.feature_importances_,

@@ -350,7 +350,7 @@ class TextProcessor:
         combined = combined.drop('stop_word_text', axis=1)
         combined = combined.drop('text', axis=1)
         combined = combined.drop('headline_text', axis=1)
-        return combined # .join(text_array, lsuffix='_headline', rsuffix='_text')
+        return combined  # .join(text_array, lsuffix='_headline', rsuffix='_text')
 
     def calculate_tf_idf(self, data_frame_column):
         """
