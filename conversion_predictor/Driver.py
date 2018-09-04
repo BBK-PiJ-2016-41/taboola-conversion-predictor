@@ -14,77 +14,95 @@ from conversion_predictor.Factory import ConnectorFactory, TokenRefresherFactory
 
 
 def main():
-        # Intro text
-        display_intro_text()
-        response = input('(please press any key to continue)')
+    """
+    The main driver class for the conversion-predictor application.
+    :return:
+    """
 
-        # Instantiate factories for ad platform access
-        connector_factory = ConnectorFactory()
-        token_factory = TokenRefresherFactory()
+    # Intro text
+    display_intro_text()
+    response = input('(please press any key to continue)')
 
-        # User should select ad platform
-        data_option = run_data_collection_preamble()
-        platform = switcher(data_option)
-        if platform != 'File':
+    # Instantiate factories for ad platform access
+    connector_factory = ConnectorFactory()
+    token_factory = TokenRefresherFactory()
+
+    # User should select ad platform
+    data_option = run_data_collection_preamble()
+    platform = switcher(data_option)
+    print(platform)
+    if platform != 'File':
+        successful_connection = 0
+        while successful_connection == 0:
             try:
                 connector = connector_factory.get_object(platform)
+                print(connector.address)
                 token_refresher = token_factory.get_object(platform)
+                successful_connection = 1
+                data = pd.DataFrame(run_extraction(connector, token_refresher))
+                data = reformat_columns(data)
+                data.set_index('ad_id', inplace=True)
             except AttributeError:
                 print('The platform you have selected is not supported.')
+                data_option = run_data_collection_preamble()
+                platform = switcher(data_option)
+                if platform == 'File':
+                    break
 
-            data = pd.DataFrame(run_extraction(connector, token_refresher))
-            data = reformat_columns(data)
-            data.set_index('ad_id', inplace=True)
+    if platform == 'File':
+        # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
+        print('We\'ll need you to specify a file containing the columns ad_id, headline_text, url, cpc, ctr, cvr.')
+        file_name = input('Please enter the full path of the file containing your ad data.').replace('\\', '\\\\')
+        try:
+            data = pd.read_csv(file_name, index_col='ad_id')
+        except FileNotFoundError:
+            print('Please specify an existing file.')
+
+    print('This is a sample of the data we will be analysing:')
+    print(data.head())
+
+    processed_data, text_processed_data = run_preprocessing(data)
+    cleaned_data = clean_columns_formats(text_processed_data)
+    # Once dataframe is complete, suggest options for EDA
+    print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.'
+          '\nThis will not include the tokenised data for ease of visualisation.')
+    viz = Visualisation(clean_columns_formats(processed_data))
+    command_interpreter = DataExploration(viz)
+    command_interpreter.cmdloop()
+
+    cleaned_data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
+
+    # Once EDA is performed, suggest options for model
+    print('You now have several options for regression analysis. The train/test split is set to 0.3')
+    regression_type = 1
+    while regression_type != '0':
+        regression_type = input('Please enter Linear, Ridge, Lasso, Random Forest or Gradient Boosting, or 0 to exit the regression phase: ')
+        if regression_type == 'Lasso':
+            model = LassoRegressionModel(clean_columns_formats(processed_data), 'cvr')
+        elif regression_type == 'Ridge':
+            model = RidgeRegressionModel(cleaned_data, 'cvr')
+        elif regression_type == 'Linear':
+            model = LinearRegressionModel(cleaned_data, 'cvr')
+        elif regression_type == 'Random Forest':
+            model = RandomForestRegressionModel(cleaned_data, 'cvr')
+        elif regression_type == 'Gradient Boosting':
+            model = GradientBoostingRegressionModel(cleaned_data, 'cvr')
         else:
-            # Alternatively user should provide file with ad text, URLs, cvrs, cpc and ctr
-            print('We\'ll need you to specify a file containing the columns ad_id, headline_text, url, cpc, ctr, cvr.')
-            file_name = input('Please enter the full path of the file containing your ad data.').replace('\\', '\\\\')
-            try:
-                data = pd.read_csv(file_name, index_col='ad_id')
-            except FileNotFoundError:
-                print('Please specify an existing file.')
+            print('Please enter Linear, Ridge, Lasso, Random Forest, Gradient Boosting, or 0 to exit.')
 
-        print('This is a sample of the data we will be analysing:')
-        print(data.head())
+        if regression_type != '0':
+            model_explorer = ModelExploration(model)
+            model_explorer.cmdloop()
 
-        processed_data, text_processed_data = run_preprocessing(data)
-        cleaned_data = clean_columns_formats(text_processed_data)
-        # Once dataframe is complete, suggest options for EDA
-        print('Data preprocessing is now complete. You have some options for Exploratory Data Analysis.'
-              '\nThis will not include the tokenised data for ease of visualisation.')
-        viz = Visualisation(clean_columns_formats(processed_data))
-        command_interpreter = DataExploration(viz)
-        command_interpreter.cmdloop()
-
-        cleaned_data.to_csv('C:\\Users\\Kathryn\\PycharmProjects\\taboola-conversion-predictor\\TextFilesAndCsvs\\TestOutput.csv')
-
-        # Once EDA is performed, suggest options for model
-        print('You now have several options for regression analysis. The train/test split is set to 0.3')
-        regression_type = 1
-        while regression_type != '0':
-            regression_type = input('Please enter Linear, Ridge, Lasso, Random Forest or Gradient Boosting, or 0 to exit the regression phase: ')
-            if regression_type == 'Lasso':
-                model = LassoRegressionModel(clean_columns_formats(processed_data), 'cvr')
-            elif regression_type == 'Ridge':
-                model = RidgeRegressionModel(cleaned_data, 'cvr')
-            elif regression_type == 'Linear':
-                model = LinearRegressionModel(cleaned_data, 'cvr')
-            elif regression_type == 'Random Forest':
-                model = RandomForestRegressionModel(cleaned_data, 'cvr')
-            elif regression_type == 'Gradient Boosting':
-                model = GradientBoostingRegressionModel(cleaned_data, 'cvr')
-            else:
-                print('Please enter Linear, Ridge, Lasso, Random Forest, Gradient Boosting, or 0 to exit.')
-
-            if regression_type != '0':
-                model_explorer = ModelExploration(model)
-                model_explorer.cmdloop()
-
-        output_file = input('Please specify the file you would like to output your data to.')
-        processed_data.to_csv(output_file)
+    # Finally, output the data to the specified destination.
+    output_file = input('Please specify the file you would like to output your data to.')
+    processed_data.to_csv(output_file)
 
 
 def display_intro_text():
+    """
+    Method to display the introduction to the application.
+    """
     intro_text = """    Welcome to the Conversion Rate Predictor.
     This application will analyse text-based features of your CDN campaigns, and suggest which are
     most likely to contribute positively towards a high conversion rate.
@@ -100,6 +118,10 @@ def display_intro_text():
 
 
 def run_data_collection_preamble():
+    """
+    Method to establish the data collection format.
+    :return: The code letter for the required data collection format.
+    """
     explanation_text = """
     Firstly, please select your data collection method.
     """
@@ -115,6 +137,12 @@ def run_data_collection_preamble():
 
 
 def run_extraction(connector, authenticator):
+    """
+    Extracts the data from the specified location.
+    :param connector: Class to make connection to ad platform
+    :param authenticator: Class to provide authentication
+    :return: The data extracted from the ad platform
+    """
     auth = authenticator.refresh_tokens()[1]
     start_date = input('Please enter the start date in the format YYYY-MM-DD')
     end_date = input('Please enter the end date in the format YYYY-MM-DD')
@@ -131,6 +159,11 @@ def run_extraction(connector, authenticator):
 
 
 def run_preprocessing(data):
+    """
+    Runs the data preprocessing steps in the pipeline
+    :param data: The data extracted from ad platform or file
+    :return: The features extracted from the data, token features (can be discarded in cases of feature proliferation)
+    """
     print('Extracting features from ad headline....')
     try:
         ad_extractor = AdExtractor(data[['headline_text']])
@@ -157,6 +190,11 @@ def run_preprocessing(data):
 
 
 def clean_columns_formats(data):
+    """
+    Drops any text based fields from the data to be run by the models
+    :param data: the processed data
+    :return: the dataframe without any text fields, and with missing values imputated
+    """
     data = data.drop('headline_text', axis=1)
     data = data.drop('url', axis=1)
     data = data.drop('domain', axis=1)
@@ -166,6 +204,11 @@ def clean_columns_formats(data):
 
 
 def switcher(input):
+    """
+    Produces the beginning of the class name for each data extraction type. File is the default return type.
+    :param input: The code letter inputted by the user
+    :return: The extraction type
+    """
     dictionary = {
         'T': 'Taboola',
         'F': 'File'
@@ -173,11 +216,12 @@ def switcher(input):
     return dictionary.get(input, 'File')
 
 
-def output_results():
-    TODO
-
-
 def reformat_columns(data):
+    """
+    Standardises the columns in the data produced by the ad platform.
+    :param data: The data extracted from the ad platform
+    :return: The data copied into new column names
+    """
     columns = {
         'ctr': 'ctr',
         'item': 'ad_id',

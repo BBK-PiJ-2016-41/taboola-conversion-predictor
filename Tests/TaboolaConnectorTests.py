@@ -1,4 +1,5 @@
 from conversion_predictor.Connector import TaboolaConnector
+from conversion_predictor.Factory import ConnectorFactory
 from unittest import TestCase
 
 
@@ -52,3 +53,9 @@ class TaboolaConnectorTests(TestCase):
         result = self.connector.get_data()
         print(result[1])
         self.assertEqual(result[0], 200)
+
+    def test_factory_pattern(self):
+        connector_factory = ConnectorFactory()
+        connector = connector_factory.get_object('Taboola')
+        address = "https://backstage.taboola.com/backstage/api/1.0/mvfglobal-network/reports/top-campaign-content/dimensions/item_breakdown"
+        self.assertEqual(connector.address, address)
