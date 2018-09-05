@@ -83,6 +83,6 @@ Kathryn Buckley (BBK-PiJ-2016-41)
 
 ## Acknowledgments
 
-* Bitcoyne
+* Stephen Coyne
 * https://towardsdatascience.com/the-art-of-effective-visualization-of-multi-dimensional-data-6c7202990c57
 * https://stackoverflow.com/questions/46759492/syllable-count-in-python
