@@ -1,9 +1,8 @@
 import sys
 from conversion_predictor.Connector import TaboolaConnector
 from conversion_predictor.TokenRefresher import TaboolaTokenRefresher
-from pydoc import locate
 import importlib
-from abc import ABC, abstractmethod
+from abc import ABC
 
 
 class Factory(ABC):

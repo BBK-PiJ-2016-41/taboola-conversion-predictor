@@ -237,7 +237,3 @@ def reformat_columns(data):
         data_copy[columns[column]] = data[column]
 
     return data_copy
-
-
-if __name__ == '__main__':
-    main()
