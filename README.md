@@ -4,7 +4,8 @@ This software is a simple data processing pipeline. It ingests data from the adv
 
 ## Getting Started
 
-It is recommended to download this software via PyCharm. Otherwise, there is a command-line interface available; please download the conversion_predictor folder.
+It is recommended to download this software via PyCharm -> New Project from Version Control. Otherwise, there is a command-line interface available; please download the conversion_predictor folder.
+You may need to update the setting of the system path in Factory.py.
 
 ### Prerequisites
 
